@@ -1,6 +1,6 @@
-# Pokémon 2 Electric Boogaloo - test change 2 boogaloo
+# Pokémon 3 Return of the Kingler
 
-Our team meets again, but this time with a larger scope for our project. Our goal: what 6-Pokémon team can most efficiently beat the Elite Four
+Our team meets yet again, but this time with an even larger scope for our project. Our goal: what 6-Pokémon team can most efficiently beat the Elite Four?
 
 ## About This Repository
 
