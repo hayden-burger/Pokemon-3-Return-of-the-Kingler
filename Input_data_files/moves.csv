@@ -48,8 +48,8 @@ rattata,7,quick-attack,normal,40,100,30,physical,Inflicts regular damage with no
 rattata,14,hyper-fang,normal,80,90,15,physical,Has a 10% chance to make the target flinch.,10,1,N/A,0
 rattata,23,focus-energy,normal,0,_,30,status,Increases the user's chance to score a critical hit.,100,1,N/A,0
 rattata,34,super-fang,normal,0,90,10,physical,Inflicts damage equal to half the target's HP.,100,1,N/A,0
-spearow,1,peck,flying,35,100,35,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 spearow,1,growl,normal,0,100,40,status,Lowers the target's Attack by one stage.,100,1,attack,-1
+spearow,1,peck,flying,35,100,35,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 spearow,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 spearow,9,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 spearow,15,fury-attack,normal,15,85,20,physical,Hits 2-5 times in one turn.,100,1,N/A,0
@@ -80,8 +80,8 @@ nidoran-f,21,tail-whip,normal,0,100,30,status,Lowers the target's Defense by one
 nidoran-f,29,bite,normal,60,100,25,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
 nidoran-f,36,fury-swipes,normal,18,80,15,physical,Hits 2-5 times in one turn.,100,1,N/A,0
 nidoran-f,43,double-kick,fighting,30,100,30,physical,Hits twice in one turn.,100,1,N/A,0
-nidoran-m,1,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 nidoran-m,1,tackle,normal,35,95,35,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
+nidoran-m,1,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 nidoran-m,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 nidoran-m,8,horn-attack,normal,65,100,25,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 nidoran-m,14,poison-sting,poison,15,100,35,physical,Has a 30% chance to poison the target.,30,1,N/A,0
@@ -97,8 +97,8 @@ vulpix,21,roar,normal,0,100,20,status,Immediately ends wild battles.  Forces tra
 vulpix,28,confuse-ray,ghost,0,100,10,status,Confuses the target.,100,1,N/A,0
 vulpix,35,flamethrower,fire,95,100,15,special,Has a 10% chance to burn the target.,10,1,N/A,0
 vulpix,42,fire-spin,fire,15,70,15,special,Prevents the target from fleeing and inflicts damage for 2-5 turns.,100,1,N/A,0
-zubat,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 zubat,1,leech-life,bug,20,100,15,physical,Drains half the damage inflicted to heal the user.,100,1,N/A,0
+zubat,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 zubat,10,supersonic,normal,0,55,20,status,Confuses the target.,100,1,N/A,0
 zubat,15,bite,normal,60,100,25,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
 zubat,21,confuse-ray,ghost,0,100,10,status,Confuses the target.,100,1,N/A,0
@@ -158,8 +158,8 @@ mankey,21,fury-swipes,normal,18,80,15,physical,Hits 2-5 times in one turn.,100,1
 mankey,27,focus-energy,normal,0,_,30,status,Increases the user's chance to score a critical hit.,100,1,N/A,0
 mankey,33,seismic-toss,fighting,0,100,20,physical,Inflicts damage equal to the user's level.,100,1,N/A,0
 mankey,39,thrash,normal,90,100,20,physical,"Hits every turn for 2-3 turns, then confuses the user.",100,1,N/A,0
-growlithe,1,roar,normal,0,100,20,status,Immediately ends wild battles.  Forces trainers to switch Pokémon.,100,1,N/A,0
 growlithe,1,bite,normal,60,100,25,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
+growlithe,1,roar,normal,0,100,20,status,Immediately ends wild battles.  Forces trainers to switch Pokémon.,100,1,N/A,0
 growlithe,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 growlithe,18,ember,fire,40,100,25,special,Has a 10% chance to burn the target.,10,1,N/A,0
 growlithe,23,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
@@ -211,16 +211,16 @@ geodude,21,self-destruct,normal,130,100,5,physical,User faints.,100,1,N/A,0
 geodude,26,harden,normal,0,_,30,status,Raises the user's Defense by one stage.,100,1,defense,1
 geodude,31,earthquake,ground,100,100,10,physical,Inflicts regular damage and can hit Dig users.,100,1,N/A,0
 geodude,36,explosion,normal,170,100,5,physical,User faints.,100,1,N/A,0
-ponyta,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 ponyta,1,ember,fire,40,100,25,special,Has a 10% chance to burn the target.,10,1,N/A,0
+ponyta,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 ponyta,30,tail-whip,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 ponyta,32,stomp,normal,65,100,20,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
 ponyta,35,growl,normal,0,100,40,status,Lowers the target's Attack by one stage.,100,1,attack,-1
 ponyta,39,fire-spin,fire,15,70,15,special,Prevents the target from fleeing and inflicts damage for 2-5 turns.,100,1,N/A,0
 ponyta,43,take-down,normal,90,85,20,physical,User receives 1/4 the damage it inflicts in recoil.,100,1,N/A,0
 ponyta,48,agility,psychic,0,_,30,status,Raises the user's Speed by two stages.,100,1,speed,2
-slowpoke,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 slowpoke,1,confusion,psychic,50,100,25,special,Has a 10% chance to confuse the target.,10,1,N/A,0
+slowpoke,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 slowpoke,18,disable,normal,0,55,20,status,Disables the target's last used move for 1-8 turns.,100,1,N/A,0
 slowpoke,22,headbutt,normal,70,100,15,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
 slowpoke,27,growl,normal,0,100,40,status,Lowers the target's Attack by one stage.,100,1,attack,-1
@@ -314,8 +314,8 @@ voltorb,22,self-destruct,normal,130,100,5,physical,User faints.,100,1,N/A,0
 voltorb,29,light-screen,psychic,0,_,30,status,Reduces damage from special attacks by 50% for five turns.,100,1,N/A,0
 voltorb,36,swift,normal,60,_,20,special,Never misses.,100,1,N/A,0
 voltorb,43,explosion,normal,170,100,5,physical,User faints.,100,1,N/A,0
-exeggcute,1,barrage,normal,15,85,20,physical,Hits 2-5 times in one turn.,100,1,N/A,0
 exeggcute,1,hypnosis,psychic,0,60,20,status,Puts the target to sleep.,100,1,N/A,0
+exeggcute,1,barrage,normal,15,85,20,physical,Hits 2-5 times in one turn.,100,1,N/A,0
 exeggcute,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 exeggcute,25,reflect,psychic,0,_,20,status,Reduces damage from physical attacks by half.,100,1,N/A,0
 exeggcute,28,leech-seed,grass,0,90,10,status,"Seeds the target, stealing HP from it every turn.",100,1,N/A,0
@@ -331,8 +331,8 @@ cubone,31,focus-energy,normal,0,_,30,status,Increases the user's chance to score
 cubone,38,thrash,normal,90,100,20,physical,"Hits every turn for 2-3 turns, then confuses the user.",100,1,N/A,0
 cubone,43,bonemerang,ground,50,90,10,physical,Hits twice in one turn.,100,1,N/A,0
 cubone,46,rage,normal,20,100,20,physical,"If the user is hit after using this move, its Attack rises by one stage.",100,1,N/A,0
-lickitung,1,supersonic,normal,0,55,20,status,Confuses the target.,100,1,N/A,0
 lickitung,1,wrap,normal,15,85,20,physical,Prevents the target from fleeing and inflicts damage for 2-5 turns.,100,1,N/A,0
+lickitung,1,supersonic,normal,0,55,20,status,Confuses the target.,100,1,N/A,0
 lickitung,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 lickitung,7,stomp,normal,65,100,20,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
 lickitung,15,disable,normal,0,55,20,status,Disables the target's last used move for 1-8 turns.,100,1,N/A,0
@@ -372,8 +372,8 @@ kangaskhan,31,tail-whip,normal,0,100,30,status,Lowers the target's Defense by on
 kangaskhan,36,mega-punch,normal,80,85,20,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 kangaskhan,41,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 kangaskhan,46,dizzy-punch,normal,70,100,10,physical,Has a 20% chance to confuse the target.,20,1,N/A,0
-horsea,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 horsea,1,bubble,water,20,100,30,special,Has a 10% chance to lower the target's Speed by one stage.,10,1,speed,-1
+horsea,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 horsea,19,smokescreen,normal,0,100,20,status,Lowers the target's accuracy by one stage.,100,1,accuracy,-1
 horsea,24,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 horsea,30,water-gun,water,40,100,25,special,Inflicts regular damage with no additional effect.,100,1,N/A,0
@@ -442,9 +442,9 @@ eevee,31,tail-whip,normal,0,100,30,status,Lowers the target's Defense by one sta
 eevee,37,bite,normal,60,100,25,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
 eevee,45,take-down,normal,90,85,20,physical,User receives 1/4 the damage it inflicts in recoil.,100,1,N/A,0
 porygon,1,tackle,normal,35,95,35,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
-porygon,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
-porygon,1,conversion,normal,0,_,30,status,User's type changes to the type of one of its moves at random.,100,1,N/A,0
 porygon,1,sharpen,normal,0,_,30,status,Raises the user's Attack by one stage.,100,1,attack,1
+porygon,1,conversion,normal,0,_,30,status,User's type changes to the type of one of its moves at random.,100,1,N/A,0
+porygon,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 porygon,23,psybeam,psychic,65,100,20,special,Has a 10% chance to confuse the target.,10,1,N/A,0
 porygon,28,recover,normal,0,_,20,status,Heals the user by half its max HP.,100,1,N/A,0
 porygon,35,agility,psychic,0,_,30,status,Raises the user's Speed by two stages.,100,1,speed,2
@@ -596,8 +596,8 @@ pidgeotto,40,agility,psychic,0,_,30,status,Raises the user's Speed by two stages
 pidgeotto,49,mirror-move,flying,0,_,20,status,Uses the target's last used move.,100,1,N/A,0
 pidgeot,1,gust,normal,40,100,35,special,Inflicts regular damage and can hit Pokémon in the air.,100,1,N/A,0
 pidgeot,1,sand-attack,normal,0,100,15,status,Lowers the target's accuracy by one stage.,100,1,accuracy,-1
-pidgeot,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 pidgeot,1,quick-attack,normal,40,100,30,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
+pidgeot,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 pidgeot,21,whirlwind,normal,0,85,20,status,Immediately ends wild battles.  Forces trainers to switch Pokémon.,100,1,N/A,0
 pidgeot,31,wing-attack,flying,35,100,35,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 pidgeot,44,agility,psychic,0,_,30,status,Raises the user's Speed by two stages.,100,1,speed,2
@@ -716,8 +716,8 @@ golbat,32,wing-attack,flying,35,100,35,physical,Inflicts regular damage with no 
 golbat,43,haze,ice,0,_,30,status,"Resets all Pokémon's stats, accuracy, and evasion.",100,1,N/A,0
 gloom,1,absorb,grass,20,100,20,special,Drains half the damage inflicted to heal the user.,100,1,N/A,0
 gloom,1,poison-powder,poison,0,75,35,status,Poisons the target.,100,1,N/A,0
-gloom,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 gloom,1,stun-spore,grass,0,75,30,status,Paralyzes the target.,100,1,N/A,0
+gloom,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 gloom,19,sleep-powder,grass,0,75,15,status,Puts the target to sleep.,100,1,N/A,0
 gloom,28,acid,poison,40,100,30,special,Has a 10% chance to lower the target's Special Defense by one stage.,10,1,sp_defense,-1
 gloom,38,petal-dance,grass,70,100,10,special,"Hits every turn for 2-3 turns, then confuses the user.",100,1,N/A,0
@@ -746,8 +746,8 @@ venomoth,43,sleep-powder,grass,0,75,15,status,Puts the target to sleep.,100,1,N/
 venomoth,50,psychic,psychic,90,100,10,special,Has a 10% chance to lower the target's Special Defense by one stage.,10,1,sp_defense,-1
 dugtrio,1,scratch,normal,40,100,35,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 dugtrio,1,growl,normal,0,100,40,status,Lowers the target's Attack by one stage.,100,1,attack,-1
-dugtrio,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 dugtrio,1,dig,ground,100,100,10,physical,"User digs underground, dodging all attacks, and hits next turn.",100,1,N/A,0
+dugtrio,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 dugtrio,24,sand-attack,normal,0,100,15,status,Lowers the target's accuracy by one stage.,100,1,accuracy,-1
 dugtrio,35,slash,normal,70,100,20,physical,Has an increased chance for a critical hit.,100,1,N/A,0
 dugtrio,47,earthquake,ground,100,100,10,physical,Inflicts regular damage and can hit Dig users.,100,1,N/A,0
@@ -769,8 +769,8 @@ golduck,59,hydro-pump,water,120,80,5,special,Inflicts regular damage with no add
 primeape,1,karate-chop,normal,50,100,25,physical,Has an increased chance for a critical hit.,100,1,N/A,0
 primeape,1,scratch,normal,40,100,35,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 primeape,1,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
-primeape,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 primeape,1,fury-swipes,normal,18,80,15,physical,Hits 2-5 times in one turn.,100,1,N/A,0
+primeape,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 primeape,27,focus-energy,normal,0,_,30,status,Increases the user's chance to score a critical hit.,100,1,N/A,0
 primeape,37,seismic-toss,fighting,0,100,20,physical,Inflicts damage equal to the user's level.,100,1,N/A,0
 primeape,46,thrash,normal,90,100,20,physical,"Hits every turn for 2-3 turns, then confuses the user.",100,1,N/A,0
@@ -780,9 +780,9 @@ arcanine,1,roar,normal,0,100,20,status,Immediately ends wild battles.  Forces tr
 arcanine,1,ember,fire,40,100,25,special,Has a 10% chance to burn the target.,10,1,N/A,0
 arcanine,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 poliwhirl,1,water-gun,water,40,100,25,special,Inflicts regular damage with no additional effect.,100,1,N/A,0
-poliwhirl,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
-poliwhirl,1,bubble,water,20,100,30,special,Has a 10% chance to lower the target's Speed by one stage.,10,1,speed,-1
 poliwhirl,1,hypnosis,psychic,0,60,20,status,Puts the target to sleep.,100,1,N/A,0
+poliwhirl,1,bubble,water,20,100,30,special,Has a 10% chance to lower the target's Speed by one stage.,10,1,speed,-1
+poliwhirl,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 poliwhirl,26,double-slap,normal,15,85,10,physical,Hits 2-5 times in one turn.,100,1,N/A,0
 poliwhirl,33,body-slam,normal,85,100,15,physical,Has a 30% chance to paralyze the target.,30,1,N/A,0
 poliwhirl,41,amnesia,psychic,0,_,20,status,Raises the user's Special Defense by two stages.,100,1,sp_defense,2
@@ -794,16 +794,16 @@ poliwrath,1,hypnosis,psychic,0,60,20,status,Puts the target to sleep.,100,1,N/A,
 poliwrath,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 kadabra,1,disable,normal,0,55,20,status,Disables the target's last used move for 1-8 turns.,100,1,N/A,0
 kadabra,1,confusion,psychic,50,100,25,special,Has a 10% chance to confuse the target.,10,1,N/A,0
-kadabra,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 kadabra,1,teleport,psychic,0,_,20,status,Immediately ends wild battles.  No effect otherwise.,100,1,N/A,0
+kadabra,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 kadabra,27,psybeam,psychic,65,100,20,special,Has a 10% chance to confuse the target.,10,1,N/A,0
 kadabra,31,recover,normal,0,_,20,status,Heals the user by half its max HP.,100,1,N/A,0
 kadabra,38,psychic,psychic,90,100,10,special,Has a 10% chance to lower the target's Special Defense by one stage.,10,1,sp_defense,-1
 kadabra,42,reflect,psychic,0,_,20,status,Reduces damage from physical attacks by half.,100,1,N/A,0
 alakazam,1,disable,normal,0,55,20,status,Disables the target's last used move for 1-8 turns.,100,1,N/A,0
 alakazam,1,confusion,psychic,50,100,25,special,Has a 10% chance to confuse the target.,10,1,N/A,0
-alakazam,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 alakazam,1,teleport,psychic,0,_,20,status,Immediately ends wild battles.  No effect otherwise.,100,1,N/A,0
+alakazam,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 alakazam,27,psybeam,psychic,65,100,20,special,Has a 10% chance to confuse the target.,10,1,N/A,0
 alakazam,31,recover,normal,0,_,20,status,Heals the user by half its max HP.,100,1,N/A,0
 alakazam,38,psychic,psychic,90,100,10,special,Has a 10% chance to lower the target's Special Defense by one stage.,10,1,sp_defense,-1
@@ -834,8 +834,8 @@ weepinbell,38,razor-leaf,grass,55,95,25,physical,Has an increased chance for a c
 weepinbell,49,slam,normal,80,75,20,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 victreebel,1,acid,poison,40,100,30,special,Has a 10% chance to lower the target's Special Defense by one stage.,10,1,sp_defense,-1
 victreebel,1,razor-leaf,grass,55,95,25,physical,Has an increased chance for a critical hit.,100,1,N/A,0
-victreebel,1,sleep-powder,grass,0,75,15,status,Puts the target to sleep.,100,1,N/A,0
 victreebel,1,stun-spore,grass,0,75,30,status,Paralyzes the target.,100,1,N/A,0
+victreebel,1,sleep-powder,grass,0,75,15,status,Puts the target to sleep.,100,1,N/A,0
 victreebel,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 victreebel,13,wrap,normal,15,85,20,physical,Prevents the target from fleeing and inflicts damage for 2-5 turns.,100,1,N/A,0
 victreebel,15,poison-powder,poison,0,75,35,status,Poisons the target.,100,1,N/A,0
@@ -900,8 +900,8 @@ dodrio,45,tri-attack,normal,80,100,10,special,"Has a 20% chance to burn, freeze,
 dodrio,51,agility,psychic,0,_,30,status,Raises the user's Speed by two stages.,100,1,speed,2
 dewgong,1,headbutt,normal,70,100,15,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
 dewgong,1,growl,normal,0,100,40,status,Lowers the target's Attack by one stage.,100,1,attack,-1
-dewgong,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 dewgong,1,aurora-beam,ice,65,100,20,special,Has a 10% chance to lower the target's Attack by one stage.,10,1,attack,-1
+dewgong,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 dewgong,44,rest,psychic,0,_,5,status,"User sleeps for two turns, completely healing itself.",100,1,N/A,0
 dewgong,50,take-down,normal,90,85,20,physical,User receives 1/4 the damage it inflicts in recoil.,100,1,N/A,0
 dewgong,56,ice-beam,ice,95,100,10,special,Has a 10% chance to freeze the target.,10,1,N/A,0
@@ -943,8 +943,8 @@ hypno,37,psychic,psychic,90,100,10,special,Has a 10% chance to lower the target'
 hypno,43,meditate,psychic,0,_,40,status,Raises the user's Attack by one stage.,100,1,attack,1
 kingler,1,vice-grip,normal,55,100,30,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 kingler,1,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
-kingler,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 kingler,1,bubble,water,20,100,30,special,Has a 10% chance to lower the target's Speed by one stage.,10,1,speed,-1
+kingler,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 kingler,25,guillotine,normal,0,30,5,physical,Causes a one-hit KO.,100,1,N/A,0
 kingler,34,stomp,normal,65,100,20,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
 kingler,42,crabhammer,water,100,85,10,physical,Has an increased chance for a critical hit.,100,1,N/A,0
@@ -963,8 +963,8 @@ exeggutor,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.
 exeggutor,28,stomp,normal,65,100,20,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
 marowak,1,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 marowak,1,growl,normal,0,100,40,status,Lowers the target's Attack by one stage.,100,1,attack,-1
-marowak,1,bone-club,ground,65,85,20,physical,Has a 10% chance to make the target flinch.,10,1,N/A,0
 marowak,1,focus-energy,normal,0,_,30,status,Increases the user's chance to score a critical hit.,100,1,N/A,0
+marowak,1,bone-club,ground,65,85,20,physical,Has a 10% chance to make the target flinch.,10,1,N/A,0
 marowak,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 marowak,41,thrash,normal,90,100,20,physical,"Hits every turn for 2-3 turns, then confuses the user.",100,1,N/A,0
 marowak,48,bonemerang,ground,50,90,10,physical,Hits twice in one turn.,100,1,N/A,0
@@ -978,17 +978,17 @@ hitmonlee,43,focus-energy,normal,0,_,30,status,Increases the user's chance to sc
 hitmonlee,48,high-jump-kick,fighting,85,90,10,physical,"If the user misses, it takes half the damage it would have inflicted in recoil.",100,1,N/A,0
 hitmonlee,53,mega-kick,normal,120,75,5,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 hitmonchan,1,comet-punch,normal,18,85,15,physical,Hits 2-5 times in one turn.,100,1,N/A,0
-hitmonchan,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 hitmonchan,1,agility,psychic,0,_,30,status,Raises the user's Speed by two stages.,100,1,speed,2
+hitmonchan,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 hitmonchan,33,fire-punch,fire,75,100,15,physical,Has a 10% chance to burn the target.,10,1,N/A,0
 hitmonchan,38,ice-punch,ice,75,100,15,physical,Has a 10% chance to freeze the target.,10,1,N/A,0
 hitmonchan,43,thunder-punch,electric,75,100,15,physical,Has a 10% chance to paralyze the target.,10,1,N/A,0
 hitmonchan,48,mega-punch,normal,80,85,20,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 hitmonchan,53,counter,fighting,0,100,20,physical,Inflicts twice the damage the user received from the last physical hit it took.,100,1,N/A,0
 weezing,1,tackle,normal,35,95,35,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
-weezing,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
-weezing,1,sludge,poison,65,100,20,special,Has a 30% chance to poison the target.,30,1,N/A,0
 weezing,1,smog,poison,20,70,20,special,Has a 40% chance to poison the target.,40,1,N/A,0
+weezing,1,sludge,poison,65,100,20,special,Has a 30% chance to poison the target.,30,1,N/A,0
+weezing,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 weezing,39,smokescreen,normal,0,100,20,status,Lowers the target's accuracy by one stage.,100,1,accuracy,-1
 weezing,43,self-destruct,normal,130,100,5,physical,User faints.,100,1,N/A,0
 weezing,49,haze,ice,0,_,30,status,"Resets all Pokémon's stats, accuracy, and evasion.",100,1,N/A,0
@@ -1010,9 +1010,9 @@ chansey,38,minimize,normal,0,_,20,status,Raises the user's evasion by two stages
 chansey,44,defense-curl,normal,0,_,40,status,Raises user's Defense by one stage.,100,1,defense,1
 chansey,48,light-screen,psychic,0,_,30,status,Reduces damage from special attacks by 50% for five turns.,100,1,N/A,0
 chansey,54,double-edge,normal,100,100,15,physical,User receives 1/3 the damage inflicted in recoil.,100,1,N/A,0
+seadra,1,smokescreen,normal,0,100,20,status,Lowers the target's accuracy by one stage.,100,1,accuracy,-1
 seadra,1,bubble,water,20,100,30,special,Has a 10% chance to lower the target's Speed by one stage.,10,1,speed,-1
 seadra,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
-seadra,1,smokescreen,normal,0,100,20,status,Lowers the target's accuracy by one stage.,100,1,accuracy,-1
 seadra,24,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 seadra,30,water-gun,water,40,100,25,special,Inflicts regular damage with no additional effect.,100,1,N/A,0
 seadra,41,agility,psychic,0,_,30,status,Raises the user's Speed by two stages.,100,1,speed,2
@@ -1070,8 +1070,8 @@ gyarados,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,
 gyarados,52,hyper-beam,normal,150,90,5,special,User foregoes its next turn to recharge.,100,1,N/A,0
 vaporeon,1,sand-attack,normal,0,100,15,status,Lowers the target's accuracy by one stage.,100,1,accuracy,-1
 vaporeon,1,tackle,normal,35,95,35,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
-vaporeon,1,quick-attack,normal,40,100,30,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 vaporeon,1,water-gun,water,40,100,25,special,Inflicts regular damage with no additional effect.,100,1,N/A,0
+vaporeon,1,quick-attack,normal,40,100,30,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 vaporeon,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 vaporeon,37,tail-whip,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 vaporeon,40,bite,normal,60,100,25,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
@@ -1103,38 +1103,38 @@ flareon,48,rage,normal,20,100,20,physical,"If the user is hit after using this m
 flareon,54,flamethrower,fire,95,100,15,special,Has a 10% chance to burn the target.,10,1,N/A,0
 omastar,1,horn-attack,normal,65,100,25,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 omastar,1,water-gun,water,40,100,25,special,Inflicts regular damage with no additional effect.,100,1,N/A,0
-omastar,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 omastar,1,withdraw,water,0,_,40,status,Raises the user's Defense by one stage.,100,1,defense,1
+omastar,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 omastar,39,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 omastar,44,spike-cannon,normal,20,100,15,physical,Hits 2-5 times in one turn.,100,1,N/A,0
 omastar,49,hydro-pump,water,120,80,5,special,Inflicts regular damage with no additional effect.,100,1,N/A,0
 kabutops,1,scratch,normal,40,100,35,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 kabutops,1,absorb,grass,20,100,20,special,Drains half the damage inflicted to heal the user.,100,1,N/A,0
-kabutops,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 kabutops,1,harden,normal,0,_,30,status,Raises the user's Defense by one stage.,100,1,defense,1
+kabutops,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 kabutops,39,slash,normal,70,100,20,physical,Has an increased chance for a critical hit.,100,1,N/A,0
 kabutops,46,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
 kabutops,53,hydro-pump,water,120,80,5,special,Inflicts regular damage with no additional effect.,100,1,N/A,0
 snorlax,1,headbutt,normal,70,100,15,physical,Has a 30% chance to make the target flinch.,30,1,N/A,0
-snorlax,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
-snorlax,1,rest,psychic,0,_,5,status,"User sleeps for two turns, completely healing itself.",100,1,N/A,0
 snorlax,1,amnesia,psychic,0,_,20,status,Raises the user's Special Defense by two stages.,100,1,sp_defense,2
+snorlax,1,rest,psychic,0,_,5,status,"User sleeps for two turns, completely healing itself.",100,1,N/A,0
+snorlax,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 snorlax,35,body-slam,normal,85,100,15,physical,Has a 30% chance to paralyze the target.,30,1,N/A,0
 snorlax,41,harden,normal,0,_,30,status,Raises the user's Defense by one stage.,100,1,defense,1
 snorlax,48,double-edge,normal,100,100,15,physical,User receives 1/3 the damage inflicted in recoil.,100,1,N/A,0
 snorlax,56,hyper-beam,normal,150,90,5,special,User foregoes its next turn to recharge.,100,1,N/A,0
 dragonair,1,wrap,normal,15,85,20,physical,Prevents the target from fleeing and inflicts damage for 2-5 turns.,100,1,N/A,0
 dragonair,1,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
-dragonair,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 dragonair,1,thunder-wave,electric,0,100,20,status,Paralyzes the target.,100,1,N/A,0
+dragonair,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 dragonair,20,agility,psychic,0,_,30,status,Raises the user's Speed by two stages.,100,1,speed,2
 dragonair,35,slam,normal,80,75,20,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 dragonair,45,dragon-rage,dragon,0,100,10,special,Inflicts 40 points of damage.,100,1,N/A,0
 dragonair,55,hyper-beam,normal,150,90,5,special,User foregoes its next turn to recharge.,100,1,N/A,0
 dragonite,1,wrap,normal,15,85,20,physical,Prevents the target from fleeing and inflicts damage for 2-5 turns.,100,1,N/A,0
 dragonite,1,leer,normal,0,100,30,status,Lowers the target's Defense by one stage.,100,1,defense,-1
-dragonite,1,agility,psychic,0,_,30,status,Raises the user's Speed by two stages.,100,1,speed,2
 dragonite,1,thunder-wave,electric,0,100,20,status,Paralyzes the target.,100,1,N/A,0
+dragonite,1,agility,psychic,0,_,30,status,Raises the user's Speed by two stages.,100,1,speed,2
 dragonite,1,struggle,normal,50,_,1,physical,User takes 1/4 its max HP in recoil.,10,1,N/A,0
 dragonite,35,slam,normal,80,75,20,physical,Inflicts regular damage with no additional effect.,100,1,N/A,0
 dragonite,45,dragon-rage,dragon,0,100,10,special,Inflicts 40 points of damage.,100,1,N/A,0

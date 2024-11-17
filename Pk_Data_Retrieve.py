@@ -42,7 +42,7 @@ for i in gen_1_pokemon:
         'type2': pk_data['types'][1]['type']['name'] if len(pk_data['types']) > 1 else 'N/A',
         'height_(m)': pk_data['height'] / 10,
         'weight_(kg)': pk_data['weight'] / 10,
-        'total_stats': sum(stat['base_stat'] for stat in pk_data['stats']),
+        'base_total': sum(stat['base_stat'] for stat in pk_data['stats']),
         'hp': pk_data['stats'][0]['base_stat'],
         'attack': pk_data['stats'][1]['base_stat'],
         'defense': pk_data['stats'][2]['base_stat'],
