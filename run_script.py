@@ -1,10 +1,11 @@
 #run pokemon script
 
+#import libraries
 import sys
 import pandas as pd
 import os
-import json
 
+#number fights
 if len(sys.argv) >=2 :
     #run index number
     nfights = int(sys.argv[1])
@@ -12,12 +13,15 @@ else:
     #Not enough inputs
     nfights = 1
 
-teams = pd.read_csv("random_teams.csv",header=None)
+#get teams from csv
+teams = pd.read_csv("Input_data_files/random_teams.csv",header=None)
 teamnumbers = len(teams)
 
+#feed teams to pokemon script (runs battlse and writes results to elite_resutls_test.xlsx)
 for i in range(teamnumbers):
-    team_list = teams.loc[1].to_list()
-    list_as_string = json.dumps(team_list,separators=(',',':'))
-    command = f"python pokemon_script.py '{list_as_string}'"
-    #print(command)
+    
+    command = f"python pokemon_script.py {i+1}"
+    for value in teams.loc[i].values:
+        command = command + " " + value
+    
     os.system(command)
