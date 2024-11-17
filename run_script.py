@@ -17,6 +17,7 @@ teamnumbers = len(teams)
 
 for i in range(teamnumbers):
     team_list = teams.loc[1].to_list()
-    list_as_string = json.dumps(team_list)
-    command = f"python pokemon_script.py {list_as_string}"
+    list_as_string = json.dumps(team_list,separators=(',',':'))
+    command = f"python pokemon_script.py '{list_as_string}'"
+    #print(command)
     os.system(command)

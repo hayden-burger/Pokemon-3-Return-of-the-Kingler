@@ -12,6 +12,7 @@ import json
 #Initial Conditions should be fed into python script
 if len(sys.argv) >=2 :
     argstring = sys.argv[1]
+    print(argstring)
     player_team = json.loads(argstring)
     #run index number
     #poke_index = int(sys.argv[1])
