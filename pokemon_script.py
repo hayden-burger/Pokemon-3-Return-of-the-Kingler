@@ -11,15 +11,15 @@ import sys
 if len(sys.argv) >=2:
     poke_index = int(sys.argv[1])
     player_team = []
-    for i in range(2,len(sys.argv)):
+    for i in range(3,len(sys.argv)):
         player_team.append(sys.argv[i])
     
-    #fight_index = int(sys.argv[2])
+    fight_index = int(sys.argv[2])
 else:
     #Not enough inputs
     player_team = ['gyarados','zapdos','moltres','articuno','mew','mewtwo']
     poke_index = 1
-    #fight_index = 1
+    fight_index = 1
 
 ###Things to index: 
 #1: which team we're on
@@ -44,6 +44,7 @@ def write_results_append(columns,results,sheet_name,file_name):
     string_list = [str(element) for element in results]
     ws.append(string_list)
     wb.save(file_name)
+    wb.close
     return
 
 
@@ -62,14 +63,15 @@ for team in elite_list:
 playerteam = pk.create_pokemon_objects(player_team)
 
 #headers
-columns = ['Result','Time','Winner','Winner List']
+columns = ['Run','Result','Time','Winner','Winner List']
 
 #run battle
 results = pk.run_elite(playerteam,elite,verbose=False)
+full_line = (fight_index,)+results
 
 #define names for excel file
 sheet_name = f"team{poke_index}"
 file_name = "Output_data_files/elite_results_test.xlsx"
 
 #add results to sheet
-write_results_append(columns,results,sheet_name,file_name)
+write_results_append(columns,full_line,sheet_name,file_name)
