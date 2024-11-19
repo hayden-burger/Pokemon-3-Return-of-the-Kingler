@@ -10,11 +10,13 @@ import random
 import copy
 
 
+
 #---------------------------------------------------------------------------------
 #Pull Data 
 ###################################
 #Pokemon_df:
 Pokemon_df = pd.read_csv('Input_data_files/pokemon.csv', index_col = 'name', keep_default_na=False)
+lvl = 1
 
 #---------------------------------------------------------------------------------
 # Merge Moves Data
@@ -22,21 +24,20 @@ merged_moves_df = pd.read_csv('Input_data_files/moves.csv', keep_default_na=Fals
 
 #---------------------------------------------------------------------------------
 
-# edit stats for level
-stats = ['hp', 'speed', 'attack', 'sp_attack', 'defense', 'sp_defense']
-Pokemon_level = 1
-
-for pokemon in Pokemon_df.index:
-    Pokemon_df.loc[pokemon, 'level'] = Pokemon_level
-    if Pokemon_level == 1:
-        pass
-    else:
+def levelup(Pokemon_dataframe = Pokemon_df, level=1):
+    '''Function to level up all Pokemon to a specified level'''
+    # edit stats for level
+    stats = ['hp', 'speed', 'attack', 'sp_attack', 'defense', 'sp_defense']
+    for pokemon in Pokemon_dataframe.index:
+        Pokemon_dataframe.loc[pokemon, 'level'] = level
         for stat in stats:
             if stat == 'hp':
-                Pokemon_df.loc[pokemon, stat] = int(((Pokemon_df.loc[pokemon, stat] * 2) * Pokemon_level / 100) + Pokemon_level + 10)
+                Pokemon_dataframe.loc[pokemon, stat] = int(((Pokemon_dataframe.loc[pokemon, stat] * 2 + 15 + 510/6) * level / 100) + level + 10)
             else:
-                Pokemon_df.loc[pokemon, stat] = int(((Pokemon_df.loc[pokemon, stat] * 2) * Pokemon_level / 100)+ 5)
-
+                Pokemon_dataframe.loc[pokemon, stat] = int(((Pokemon_dataframe.loc[pokemon, stat] * 2 + 15 + 510/6) * level / 100) + 5)
+        Pokemon_dataframe.loc[pokemon, 'base_total'] = Pokemon_dataframe.loc[pokemon, stats].sum()
+    return Pokemon_dataframe
+Pokemon_df = levelup(Pokemon_df,lvl)
 
 #--------------------------------------------------------------------------------
 def verboseprint(printstatement,verbose):
@@ -254,11 +255,12 @@ class Pokemon:
         if self.move_embargo:
             for move in list(self.move_embargo.keys()):
                 self.move_embargo[move] -= 1
-                if self.move_embargo[move] == 0:
-                    del self.move_embargo[move]
+                if self.move_embargo[move] <= 0:
                     verboseprint(f'  {move} is no longer disabled', verbose)
+                    del self.move_embargo[move]
                 else:
-                    available_moves.remove(move)
+                    if move in available_moves:
+                        available_moves.remove(move)
                     verboseprint(f'  {move} is disabled', verbose)
 
         #If there are still moves to choose from, randomly select a move
@@ -596,8 +598,8 @@ class Pokemon:
             verboseprint('  teleported away',verbose)
         if effect == "Disables the target's last used move for 1-8 turns.":
             if other.last_attack != False and other.last_attack != 'struggle':
-                other.move_embargo[other.last_attack] = random.randint(1,8)*2
-                verboseprint(f'  {other.last_attack} was disabled for {other.move_embargo[other.last_attack]/2} turns',verbose)
+                other.move_embargo[other.last_attack] = random.randint(1,8)+1
+                verboseprint(f'  {other.last_attack} was disabled for {other.move_embargo[other.last_attack]-1} turns',verbose)
         if effect == 'User sleeps for two turns, completely healing itself.':
             self.effects_nv['sleep'] = True
             self.effect_counter['sleep'] = 2
@@ -815,18 +817,20 @@ def check_winner(pokemona,pokemonb):
     
 #----------------------------------------------------------------------------------------
 
-def create_pokemon_dict(generation = 1):
+def create_pokemon_dict(generation = 1, pk_level = 1):
     '''Create a dictionary of pokemon objects'''
     # Assign all pokemon as a class
+    Pokemon_df = levelup(level = pk_level)
     gen1 = np.where(Pokemon_df['generation'] == generation) #isolates gen 1 pokemon
     pokemon_dict = {} #Dictionary in {Pokemon name:Pokemon class format}
+    
     for pokemon_name in Pokemon_df.iloc[gen1].index: #for every pokemon in gen 1
         #assign a class as a member of the dictionary
         pokemon_dict[pokemon_name] = Pokemon(pokemon_name)
     return pokemon_dict
 
-def create_pokemon_objects(pokemon_list):
-    pokemon_dict = create_pokemon_dict()
+def create_pokemon_objects(pokemon_list, generation = 1,  pk_level = 1):
+    pokemon_dict = create_pokemon_dict(generation, pk_level)
     return [pokemon_dict[pk] for pk in pokemon_list]
 
 #----------------------------------------------------------------------------------------
@@ -892,7 +896,7 @@ def run_elite(our_team,verbose = False,roundreset = True):
 
     elite4 = []
     for team in elite_list:
-        elite4.append(create_pokemon_objects(team))
+        elite4.append(create_pokemon_objects(team, generation = 1, pk_level = 50))
     
     for team in elite4:
         if team ==  elite4[0]:
@@ -939,3 +943,5 @@ if __name__ == '__main__':
     print("%.2f minutes" % time)
     print(teamname)
     print(winnerlist)
+    print('---------------------------------')
+    

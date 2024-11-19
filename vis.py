@@ -43,7 +43,8 @@ team_data = load_data('Output_data_files/elite_results.xlsx', sheet_name = None,
 random_team_data = load_data('Output_data_files/Random_Team_Summary.csv', index_col=1)
 random_team_data.rename(columns={'Unnamed: 0':'Team Number'}, inplace=True)
 # Adjust the path to your file
-file_options_wins = {'Level 1 data': 'Output_data_files/Level_1_1000runs.csv'}  # Dictionary of file options
+file_options_wins = {'Level 1 data': 'Output_data_files/Level_1_1000runs.csv', 'Level 50 data': 'Output_data_files/Level_50_1000runs.csv'}
+level = 1
 
 # Color mapping for Pokémon types
 type_colors = {
@@ -65,7 +66,7 @@ type_colors = {
 }
 
 # create a dictionary of pokemon objects
-pk_dict = pk.create_pokemon_dict()
+pk_dict = pk.create_pokemon_dict(level=level)
 # create a series of list of pokemon objects for each Elite Four Team
 elite4_1 = ['dewgong','cloyster','slowbro','jynx','lapras']
 elite4_2 = ['onix','hitmonlee','hitmonchan','onix','machamp']
@@ -237,10 +238,17 @@ def plot_performance(selected_pokemon):
     st.plotly_chart(fig_performance)
 
 # Function to display Pokémon details in a compact card format
-def display_pokemon_details(column, pokemon_name):
+def display_pokemon_details(column, pokemon_name, level=1):
     # Retrieve Pokémon details
     details = pokemon_data.loc[pokemon_name, ['generation', 'type1', 'type2', 'height_(m)', 'weight_(kg)', 'pokedex_number', 'image_url']]
-    moves = move_data.loc[move_data['name'].isin([pokemon_name])].move
+    pokemon = np.where(move_data['name'] == pokemon_name) #selects pokemon's moves
+    # define the moveset for the pokemon for corresponding level
+    pokemon_moves = move_data.iloc[pokemon]
+    moves = pokemon_moves[pokemon_moves['level'] <= level]
+    moves = moves['move']
+    # drop strugle move
+    moves = moves[moves != 'struggle']
+    
     html_content = f"""
                     <img src="{details['image_url']}" width="100"><br>
                     <b style='font-size: 20px;'>{pokemon_name}</b><br>
@@ -263,10 +271,24 @@ def display_pokemon_details(column, pokemon_name):
         st.markdown(html_content, unsafe_allow_html=True)
 
 # Comparison function with color coding integration
-def compare_pokemon(column, pokemon1, pokemon2, pokemon1_color, pokemon2_color, max_base_total):
+def compare_pokemon(column, pokemon1, pokemon2, pokemon1_color, pokemon2_color, max_base_total, level=1):
     attrs = ['base_total', 'hp', 'speed', 'attack', 'defense', 'sp_attack', 'sp_defense']
-    pokemon1_data = pokemon_data.loc[pokemon1, attrs]
-    pokemon2_data = pokemon_data.loc[pokemon2, attrs]
+    pokemon1_data = pokemon_data.loc[pokemon1, attrs].copy()
+    pokemon2_data = pokemon_data.loc[pokemon2, attrs].copy()
+    
+    if level != 1:
+        for stat in attrs:
+            if stat == 'base_total':
+                pokemon1_data['base_total'] = 0
+                pokemon2_data['base_total'] = 0
+            if stat == 'hp':
+                pokemon1_data[stat] = int(((pokemon1_data[stat] * 2) * level / 100) + level + 10)
+                pokemon2_data[stat] = int(((pokemon2_data[stat] * 2) * level / 100) + level + 10)
+            else:
+                pokemon1_data[stat] = int(((pokemon1_data[stat] * 2) * level / 100) + 5)
+                pokemon2_data[stat] = int(((pokemon2_data[stat] * 2) * level / 100) + 5)
+        pokemon1_data['base_total'] = pokemon1_data[attrs].sum()
+        pokemon2_data['base_total'] = pokemon2_data[attrs].sum()
     
     comparison_data = pd.DataFrame({'Attribute': attrs, pokemon1: pokemon1_data, pokemon2: pokemon2_data}).melt(id_vars='Attribute', var_name='Pokemon', value_name='Value')
 
@@ -390,6 +412,10 @@ with page1:
     # Calculate total wins for each Pokémon
     battle_data_key = st.selectbox('Select a win data file:', options=file_options_wins, key='file_select')  # Dropdown menu for file selection
     battle_data = load_data(file_options_wins[battle_data_key], index_col='name')
+    level = int(battle_data_key.split(' ')[1])
+    pk.levelup(level)
+    pokemon_data = pk.Pokemon_df
+    move_data = pk.merged_moves_df
     total_wins = battle_data.sum(axis=1).sort_values(ascending=False).reset_index()
     total_wins.columns = ['name', 'Total Wins']  # Renaming for clarity
     # Merge total wins with pokemon_data on the Pokémon name
@@ -427,6 +453,7 @@ with page3:
     battle_data_key = st.selectbox('Select a win data file:', options=file_options_wins, key='file_select3')  # Dropdown menu for file selection
     st.write("---")  # Add a separator
     battle_data = load_data(file_options_wins[battle_data_key], index_col='name')
+    level = int(battle_data_key.split(' ')[1])
     total_wins = battle_data.sum(axis=1).sort_values(ascending=False).reset_index()
     total_wins.columns = ['name', 'Total Wins']  # Renaming for clarity
     # Merge total wins with pokemon_data on the Pokémon name
@@ -441,12 +468,13 @@ with page3:
     # Adjust the ratios to give more space to the middle column and less to the side columns
     col1, col_plot, col2 = st.columns([1, 4, 1])
     # 1st Pokemon card
-    display_pokemon_details(col1, pokemon1)
+    
+    display_pokemon_details(col1, pokemon1, level)
     # display pokemon stats 
     max_base_total = pokemon_data['base_total'].max() + 50
-    compare_pokemon(col_plot, pokemon1, pokemon2, pokemon1_color, pokemon2_color, max_base_total)
+    compare_pokemon(col_plot, pokemon1, pokemon2, pokemon1_color, pokemon2_color, max_base_total, level)
     # 2nd Pokemon card
-    display_pokemon_details(col2, pokemon2)
+    display_pokemon_details(col2, pokemon2, level)
     moves = pd.concat((move_data.loc[move_data['name'].isin([pokemon1])], (move_data.loc[move_data['name'].isin([pokemon2])]))).set_index('move').drop(columns=['name','level', 'gen']).drop_duplicates()
     col1, col_df, col2 = st.columns([1, 20, 1])
     col_df.write(moves)
@@ -458,10 +486,7 @@ with page3:
 
     wins = battle_data.loc[pokemon1, pokemon2]
     losses = battle_data.loc[pokemon2, pokemon1]
-    if 'Level 50' in battle_data_key:
-        draws = 100 - wins - losses
-    else:
-        draws = 1000 - wins - losses
+    draws = 1000 - wins - losses
     with col_wins:
         # Display Wins
         st.metric(label="Wins", value=wins)
@@ -644,6 +669,13 @@ with page6:
     fig_random_times = px.bar(non_zero_wins.sort_values(by='Wins', ascending=False), y='Avg Time Win', title='Average Time for Each Team')
     fig_random_times.update_layout(xaxis_title='Pokémon Team', yaxis_title='Average Time (m)')
     st.plotly_chart(fig_random_times)
+    st.write("---")  # Add a separator for visual clarity
+    # pull top 3 teams and display their names in a dataframe
+    top_teams = non_zero_wins.sort_values(by='Wins', ascending=False).head(3)
+    st.header('Top 3 Teams')
+    st.write(top_teams)
+    
+          
     st.write("---")  # Add a separator for visual clarity
     # Allow user to select an attribute to compare against Total Wins
     col1, col2 = st.columns(2)
