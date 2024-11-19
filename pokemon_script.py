@@ -2,51 +2,33 @@
 import numpy as np
 import pandas as pd
 import pokemon_module as pk
-import openpyxl
-from openpyxl import Workbook
 import sys
 
 
-#Arguments: poke_index and team members
+#Arguments: poke_index, n_fights
 if len(sys.argv) >=2:
     poke_index = int(sys.argv[1])
-    player_team = []
-    for i in range(3,len(sys.argv)):
-        player_team.append(sys.argv[i])
-    
-    fight_index = int(sys.argv[2])
+    n_fights = int(sys.argv[2])
 else:
     #Not enough inputs
-    player_team = ['gyarados','zapdos','moltres','articuno','mew','mewtwo']
     poke_index = 1
-    fight_index = 1
+    n_fights = 1
+
+teams = pd.read_csv("Input_data_files/random_teams.csv",header=None)
+player_team = teams.loc[poke_index-1].to_list()
 
 ###Things to index: 
 #1: which team we're on
 #2: which battle we're on (changes per job index)
 
-# function to write multiple results to excel
-def write_results_append(columns,results,sheet_name,file_name):
-    #open workbook or create it if it doesn't exist
-    try:
-        wb = openpyxl.load_workbook(file_name)
-    except FileNotFoundError:
-        wb = Workbook()
-    #use worksheet or create if it doesn't exist
-    if sheet_name in wb.sheetnames:
-        ws= wb[sheet_name]
-    else:
-        ws= wb.create_sheet(sheet_name)
-        # Write the headers to the first row
-        ws.append(columns)
-    
-    #append to filename
-    string_list = [str(element) for element in results]
-    ws.append(string_list)
-    wb.save(file_name)
-    wb.close
-    return
 
+#function to run num_runs battles and save results to dataframe
+def sim_elite(team,elite,num_runs=10):
+    results = pd.DataFrame(columns=['Result','Time','Winner','Winner List'])
+    for i in range(num_runs):
+        result,time,teamname,winnerlist = pk.run_elite(team,elite,verbose=False,roundreset=False)
+        results.loc[i] = [result,time,teamname,winnerlist]
+    return results
 
 #elite four teams
 elite4_1 = ['dewgong','cloyster','slowbro','jynx','lapras']
@@ -61,17 +43,45 @@ for team in elite_list:
     elite.append(pk.create_pokemon_objects(team))
 #player team
 playerteam = pk.create_pokemon_objects(player_team)
+team_names = joined_string = ', '.join(player_team)
 
-#headers
-columns = ['Run','Result','Time','Winner','Winner List']
 
 #run battle
-results = pk.run_elite(playerteam,elite,verbose=False)
-full_line = (fight_index,)+results
+results = sim_elite(playerteam,elite,num_runs=n_fights)
 
-#define names for excel file
-sheet_name = f"team{poke_index}"
-file_name = "Output_data_files/elite_results_test.xlsx"
+#collect battle info
+collectedresults_df = pd.DataFrame()
+nemesis_dict = {}
+team_results = results
+wins = team_results['Result'].sum()
+#calculate average time if win = 1
+avg_time_win = round(team_results[team_results['Result'] == 1]['Time'].mean(),2)
+sd_time_win = round(team_results[team_results['Result'] == 1]['Time'].std(),2)
+#calculate efficiency
+efficiency = wins/avg_time_win
+#calculate average time if win = 0
+avg_time_loss = round(team_results[team_results['Result'] == 0]['Time'].mean(),2)
+sd_time_loss = round(team_results[team_results['Result'] == 0]['Time'].std(),2)
+#record distribution of winners
+winner_dict = team_results['Winner'].value_counts().to_dict()
+#record distribution of nemesis
+for run in team_results.index:
+    #who beat them last
+    nem = team_results.iloc[np.where(team_results.index == run)]['Winner List'].values[0]
+    nemesis = nem[-1]
+    if nemesis in nemesis_dict:
+        nemesis_dict[nemesis] += 1
+    else:
+        nemesis_dict[nemesis] = 1
+#update dataframe
+collectedresults_df = pd.concat([collectedresults_df,pd.DataFrame({'Team':team_names,'Efficiency: (Wins/avg_Time)':efficiency,'Wins':wins,'Avg Time Win':avg_time_win,'SD Time Win':sd_time_win,
+                                                                                'Avg Time Loss':avg_time_loss,'SD Time Loss':sd_time_loss,
+                                                                                'Losses to Lorelei':winner_dict.get('Lorelei',0), 'Losses to Bruno':winner_dict.get('Bruno',0),
+                                                                                'Losses to Agatha':winner_dict.get('Agatha',0), 'Losses to Lance':winner_dict.get('Lance',0),
+                                                                                'Nemesis':max(nemesis_dict, key=nemesis_dict.get), 'Nemesis Losses':nemesis_dict[max(nemesis_dict, key=nemesis_dict.get)]},index=[0])])
 
-#add results to sheet
-write_results_append(columns,full_line,sheet_name,file_name)
+
+
+#save results to csv
+file_name = f"./Output_data_files/results_team_{poke_index}.csv"
+collectedresults_df.to_csv(file_name)
