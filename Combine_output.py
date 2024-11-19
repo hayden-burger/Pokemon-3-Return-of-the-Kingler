@@ -1,5 +1,5 @@
 #combine output
-import pandas
+import pandas as pd
 import glob
 
 paths = glob.glob("./Output_data_files/results_team_*.csv")
@@ -9,6 +9,9 @@ def readpaths(path_names):
     data_list = []
 
     for file_name in path_names: 
+        ## In hamming:
+        #team_number = file_name.replace("./Output_data_files/results_team_","")
+        ## In windows:
         team_number = file_name.replace("./Output_data_files\\results_team_","")
         team_number = team_number.replace(".csv","")
         team_number = int(team_number)
@@ -24,7 +27,8 @@ def readpaths(path_names):
     combined_df.rename(columns={'Unnamed: 0': 'team_num'},inplace=True)
     return combined_df
 
+combined_df = readpaths(paths)
 nteams = len(combined_df)
-filename = f"Team_Summary_{nteams}"
+filename = f"./Output_data_files/Team_Summary_{nteams}.csv"
 
 combined_df.to_csv(filename)
