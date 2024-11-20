@@ -663,7 +663,7 @@ class Pokemon:
         self.sp_defense = other.sp_defense
 
     def healthpercent(self):
-        return round(self.hp/self.start_hp,3)
+        return round(float(self.hp/self.start_hp),3)
 
     def reset(self):
         '''Resets all conditions to starting conditions'''

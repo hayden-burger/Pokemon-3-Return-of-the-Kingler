@@ -37,6 +37,7 @@ def load_data(filepath, **kwargs):
 
 # import the data from the pokemon_module
 pokemon_data = pk.Pokemon_df
+level1_pokemon_data = pk.Pokemon_df_level1
 move_data = pk.merged_moves_df
 # read all sheets from the elite_results.xlsx file
 team_data = load_data('Output_data_files/elite_results.xlsx', sheet_name = None, index_col=0)  
@@ -66,7 +67,7 @@ type_colors = {
 }
 
 # create a dictionary of pokemon objects
-pk_dict = pk.create_pokemon_dict(pk_level=level)
+pk_dict = pk.create_pokemon_dict(level1_pokemon_data,pk_level=level)
 # create a series of list of pokemon objects for each Elite Four Team
 elite4_1 = ['dewgong','cloyster','slowbro','jynx','lapras']
 elite4_2 = ['onix','hitmonlee','hitmonchan','onix','machamp']
@@ -413,9 +414,9 @@ with page1:
     battle_data_key = st.selectbox('Select a win data file:', options=file_options_wins, key='file_select')  # Dropdown menu for file selection
     battle_data = load_data(file_options_wins[battle_data_key], index_col='name')
     level = int(battle_data_key.split(' ')[1])
-    pk.levelup(pk.Pokemon_df,level)
-    pokemon_data = pk.Pokemon_df
-    move_data = pk.merged_moves_df
+    
+    pokemon_data = pk.levelup(level1_pokemon_data, level=level)
+    
     total_wins = battle_data.sum(axis=1).sort_values(ascending=False).reset_index()
     total_wins.columns = ['name', 'Total Wins']  # Renaming for clarity
     # Merge total wins with pokemon_data on the Pokémon name
@@ -454,6 +455,8 @@ with page3:
     st.write("---")  # Add a separator
     battle_data = load_data(file_options_wins[battle_data_key], index_col='name')
     level = int(battle_data_key.split(' ')[1])
+    pokemon_data = pk.levelup(level1_pokemon_data, level=level)
+    pk_dict = pk.create_pokemon_dict(pokemon_data, pk_level=level)
     total_wins = battle_data.sum(axis=1).sort_values(ascending=False).reset_index()
     total_wins.columns = ['name', 'Total Wins']  # Renaming for clarity
     # Merge total wins with pokemon_data on the Pokémon name
@@ -475,10 +478,13 @@ with page3:
     compare_pokemon(col_plot, pokemon1, pokemon2, pokemon1_color, pokemon2_color, max_base_total, level)
     # 2nd Pokemon card
     display_pokemon_details(col2, pokemon2, level)
-    moves = pd.concat((move_data.loc[move_data['name'].isin([pokemon1])], (move_data.loc[move_data['name'].isin([pokemon2])]))).set_index('move').drop(columns=['name','level', 'gen']).drop_duplicates()
-    col1, col_df, col2 = st.columns([1, 20, 1])
-    col_df.write(moves)
-    
+    moves1 =(move_data.loc[move_data['name'].isin([pokemon1])]).set_index('move').drop(columns=['name','gen']).drop_duplicates()
+    moves2 =(move_data.loc[move_data['name'].isin([pokemon2])]).set_index('move').drop(columns=['name','gen']).drop_duplicates()
+    col1, col_df1, mid, col_df2, col2 = st.columns([1, 10, 1, 10, 1])
+    col_df1.write(f"Moves for {pokemon1}:")
+    col_df1.write(moves1)
+    col_df2.write(f"Moves for {pokemon2}:")
+    col_df2.write(moves2)
     st.write("---")  # Add a separator
     
     # Use columns to create a visual effect of right-justified "Losses"
@@ -511,9 +517,6 @@ with page3:
         st.text_area("Battle Output", output, height=300)
     
     st.write("---")  # Add a separator
-    
-  
-    st.write("---")  # Add a separator for visual clarity
 
     
     
