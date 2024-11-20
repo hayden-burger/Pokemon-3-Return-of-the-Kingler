@@ -604,11 +604,12 @@ with page5:
     # Add page description
     with st.expander("Page Description"):
         st.markdown("""
-                    This page is for selecting a team of pokémon to battle the Elite Four. 
+                    This page is for selecting a team of level 50 pokémon to battle the Elite Four. 
                     The performance of the team will be recorded and displayed in the Team Battle Data page.
                     """)
     col1, col2, col3 = st.columns(3)
     # Create a selection box for choosing a team
+    pokemon_data = pk.levelup(level1_pokemon_data, level=50)
     member_1 = col1.selectbox('Select your 1st Pokémon:', options=pokemon_data.index, key='pokemon1_select_7')
     member_2 = col2.selectbox('Select your 2nd Pokémon:', options=pokemon_data.index, key='pokemon2_select_7')
     member_3 = col3.selectbox('Select your 3rd Pokémon:', options=pokemon_data.index, key='pokemon3_select_7')
