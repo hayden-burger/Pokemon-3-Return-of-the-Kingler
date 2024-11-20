@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import pokemon_module as pk
 import sys
+import math
 
 
 #Arguments: poke_index, n_fights
@@ -14,8 +15,11 @@ else:
     poke_index = 1
     n_fights = 1
 
-teams = pd.read_csv("Input_data_files/random_teams.csv",header=None)
-player_team = teams.loc[poke_index-1].to_list()
+team_index = math.floor((poke_index-1)/10000)
+infilename = "Input_data_files/random_teams_{team_index}.csv"
+teams = pd.read_csv(infilename,header=None)
+csv_loc = (poke_index%10000)-1
+player_team = teams.loc[csv_loc].to_list()
 
 ###Things to index: 
 #1: which team we're on
