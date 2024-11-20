@@ -17,8 +17,9 @@ else:
 teams = pd.read_csv("Input_data_files/random_teams.csv",header=None)
 teamnumbers = len(teams)
 
+
 #feed teams to pokemon script (runs battlse and writes results to elite_resutls_test.xlsx)
-for i in range(teamnumbers):
+for i in range(fight_index):
     
     command = f"python pokemon_script.py {i+1} {fight_index}"
     for value in teams.loc[i].values:
