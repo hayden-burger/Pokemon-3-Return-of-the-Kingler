@@ -36,4 +36,4 @@ pokemon_dict = pk.create_pokemon_dict()
 filename = f'Input_data_files/random_teams_{csv_index}.csv'
             
 np.random.seed(csv_index)
-save_teams(10000,filename)
+save_teams(100000,filename)

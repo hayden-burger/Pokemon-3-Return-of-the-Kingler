@@ -12,46 +12,31 @@ if len(sys.argv) >=2:
     n_fights = int(sys.argv[2])
 else:
     #Not enough inputs
-    poke_index = 1
+    poke_index = 0
     n_fights = 1
 
-team_index = math.floor((poke_index-1)/10000)
+#Load player team from csv
+team_index = math.floor((poke_index)/100000)
 infilename = "Input_data_files/random_teams_{team_index}.csv"
 teams = pd.read_csv(infilename,header=None)
-csv_loc = (poke_index%10000)-1
+csv_loc = (poke_index%100000)
 player_team = teams.loc[csv_loc].to_list()
 
-###Things to index: 
-#1: which team we're on
-#2: which battle we're on (changes per job index)
-
-
 #function to run num_runs battles and save results to dataframe
-def sim_elite(team,elite,num_runs=10):
+def sim_elite(team,num_runs=10):
     results = pd.DataFrame(columns=['Result','Time','Winner','Winner List'])
     for i in range(num_runs):
-        result,time,teamname,winnerlist = pk.run_elite(team,elite,verbose=False,roundreset=False)
+        result,time,teamname,winnerlist = pk.run_elite(team,verbose=False,roundreset=False)
         results.loc[i] = [result,time,teamname,winnerlist]
     return results
 
-#elite four teams
-elite4_1 = ['dewgong','cloyster','slowbro','jynx','lapras']
-elite4_2 = ['onix','hitmonlee','hitmonchan','onix','machamp']
-elite4_3 = ['gengar','golbat','haunter','arbok','gengar']
-elite4_4 = ['gyarados','dragonair','dragonair','aerodactyl','dragonite']
-elite_list = [elite4_1,elite4_2,elite4_3,elite4_4]
-
-#create pokemon objects
-elite = []
-for team in elite_list:
-    elite.append(pk.create_pokemon_objects(team))
 #player team
 playerteam = pk.create_pokemon_objects(player_team)
 team_names = joined_string = ', '.join(player_team)
 
 
 #run battle
-results = sim_elite(playerteam,elite,num_runs=n_fights)
+results = sim_elite(playerteam,num_runs=n_fights)
 
 #collect battle info
 collectedresults_df = pd.DataFrame()

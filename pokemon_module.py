@@ -1,6 +1,6 @@
 #Hayden Burger, Corinne Desroches, David Lee
 #OA 3302 Simulation Modeling
-#May 2024
+#November 2024
 #Pokemon module
 
 #import statements
@@ -8,157 +8,37 @@ import numpy as np
 import pandas as pd
 import random
 import copy
-# set pandas copy on write to be true
-pd.set_option("mode.copy_on_write", True)
+
+
 
 #---------------------------------------------------------------------------------
-#Read Data 
+#Pull Data 
 ###################################
 #Pokemon_df:
-#grab data
-Pokemon_df = pd.read_csv('Input_data_files/pokemon.csv')
-columns_to_drop = ['abilities', 'base_egg_steps','base_happiness','capture_rate', 'japanese_name', 'percentage_male', 'is_legendary']
-Pokemon_df.drop(columns_to_drop, axis=1, inplace=True)
+Pokemon_df_level1 = pd.read_csv('Input_data_files/pokemon.csv', index_col = 'name', keep_default_na=False)
+lvl = 1
 
-# combine the multiplier columns together
-against_columns = list(Pokemon_df.columns[0:18])
+#---------------------------------------------------------------------------------
+# Merge Moves Data
+merged_moves_df = pd.read_csv('Input_data_files/moves.csv', keep_default_na=False)
 
-# Create a list of columns in correct order
-new_order = ['name'] + ['classfication'] + ['generation'] + ['type1'] + ['type2']+ ['hp'] + ['speed'] + ['attack'] + ['sp_attack']+ ['defense'] + ['sp_defense'] + ['base_total'] + ['experience_growth'] + ['height_m'] + ['weight_kg'] + ['pokedex_number'] + against_columns
+#---------------------------------------------------------------------------------
 
-# Reorder the DataFrame columns
-Pokemon_df = Pokemon_df[new_order]
-
-# take all string columns to lowercase
-Pokemon_df.loc[:,['name', 'classfication', 'type1', 'type2']] = Pokemon_df.loc[:,['name', 'classfication', 'type1', 'type2']].apply(lambda x: x.str.lower())
-
-#Replace Null values with 0
-Pokemon_df.fillna(0)
-
-#isolates gen 1 pokemon
-gen1 = np.where(Pokemon_df['generation'] == 1)
-Pokemon_df = Pokemon_df.iloc[gen1]
-
-# # change nidoran♂ to nidoran-m
-Pokemon_df.loc[:,'name'] = Pokemon_df.loc[:,'name'].replace('nidoran♂','nidoran-m')
-# # change nidoran♀ to nidoran-f
-Pokemon_df.loc[:,'name'] = Pokemon_df.loc[:,'name'].replace('nidoran♀','nidoran-f')
-
-# set Pokemon name to index
-Pokemon_df.set_index('name',inplace=True)
-
-# add sprites for each pokemon
-base_url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork"
-Pokemon_df['image_url'] = Pokemon_df['pokedex_number'].apply(lambda x: f"{base_url}/{x}.png")
-
-# edit stats for level
-stats = ['hp', 'speed', 'attack', 'sp_attack', 'defense', 'sp_defense']
-Pokemon_level = 50
-Pokemon_df.head()
-for pokemon in Pokemon_df.index:
-    for stat in stats:
-        if stat == 'hp':
-            Pokemon_df.loc[pokemon, stat] = int(((Pokemon_df.loc[pokemon, stat] * 2) * Pokemon_level / 100) + Pokemon_level + 10)
-        else:
-            Pokemon_df.loc[pokemon, stat] = int(((Pokemon_df.loc[pokemon, stat] * 2) * Pokemon_level / 100)+ 5)
-
-##################################
-#Moveset_df/ L1_moves:
-# read in the 1st moveset csv
-Moveset_df = pd.read_csv('Input_data_files/Move_set_per_pokemon.csv')
-
-#Create a new dataset L1_moves for all moves of level 1
-#array of all indexes with level = 1
-moves = np.where(Moveset_df['level'] <= Pokemon_level)
-#new dataset indexed by array of indexes
-L1_moves = Moveset_df.iloc[moves]
-# reindex after truncation
-L1_moves.index = (range(len(L1_moves)))
-# take all string columns to lowercase
-L1_moves.loc[:,['name', 'move', 'type']] = L1_moves.loc[:,['name', 'move', 'type']].apply(lambda x: x.str.lower())
-#remove all % from accuracy
-L1_moves.loc[:,['accuracy']] = L1_moves.loc[:,['accuracy']].apply(lambda x: x.str.strip('%'))
-# replace all - power and pp values with zeros
-L1_moves.loc[:,['power', 'pp']] = L1_moves.loc[:,['power', 'pp']].replace('—','0')
-L1_moves.loc[:,['accuracy']] = L1_moves.loc[:,['accuracy']].replace('—','_')
-# correct accuracy for jynx pound PP from 3500% to 35
-L1_moves.loc[np.where(L1_moves['move'] == 'pound')[0], ['pp']] = L1_moves.loc[np.where(L1_moves['move'] == 'pound')[0], ['pp']].replace('3500%',35)
-# correct accuracy for Mew Swift from underscore to infinity (999999)
-L1_moves.loc[np.where(L1_moves['move'] == 'swift')[0], ['accuracy']] = 999999
-# typecast values to int
-L1_moves['power'] = pd.to_numeric(L1_moves['power'])
-L1_moves['pp'] = pd.to_numeric(L1_moves['pp'])
-#change name farfetchd to farfetch'd and mr-mime to mr. mime
-L1_moves.loc[:,['name']] = L1_moves.loc[:,['name']].replace('farfetchd',"farfetch'd")
-L1_moves.loc[:,['name']] = L1_moves.loc[:,['name']].replace('mr-mime',"mr. mime")
-# change 'smoke screen' to 'smokescreen', 'vicegrip' to 'vise grip', 'hi jump kick' to 'high jump kick', and 'self-destruct' to 'self destruct'
-L1_moves.loc[:,['move']] = L1_moves.loc[:,['move']].replace('smoke screen','smokescreen')
-L1_moves.loc[:,['move']] = L1_moves.loc[:,['move']].replace('vice grip','vise grip')
-L1_moves.loc[:,['move']] = L1_moves.loc[:,['move']].replace('vicegrip','vise grip')
-L1_moves.loc[:,['move']] = L1_moves.loc[:,['move']].replace('hi jump kick','high jump kick')
-L1_moves.loc[:,['move']] = L1_moves.loc[:,['move']].replace('self destruct','self-destruct')
-
-# add the move 'struggle' to the L1_moves dataframe so that it is kept on the merge later.
-struggle_row = pd.DataFrame([{'name': 'any', 'level': 1, 'move': 'struggle', 'type': 'normal', 'power': 50, 'accuracy': 100, 'pp': 999}])
-L1_moves = pd.concat((L1_moves, struggle_row), ignore_index=True)
-
-##############################################
-#AMoveset:
-# read in 'Moveset.csv', make all columns lowercase, drop the tm column, and pull just generation 1 moves
-AMoveset = pd.read_csv('Input_data_files/Moveset.csv')
-AMoveset.rename(str.lower, axis='columns', inplace=True)
-AMoveset.rename(columns={'name': 'move'}, inplace=True)
-AMoveset.rename(columns={'acc': 'accuracy'}, inplace=True)
-AMoveset.rename(columns={'prob.(%)': 'effect_prob'}, inplace=True)
-AMoveset.drop(['tm'],axis = 1, inplace=True)
-gen1moves = np.where(AMoveset['gen'] == 1)
-AMoveset = AMoveset.iloc[gen1moves]
-
-# take all string values and make them lowercase for columns whose values are strings
-AMoveset.loc[:,['move', 'type', 'category', 'effect']] = AMoveset.loc[:,['move', 'type', 'category', 'effect']].apply(lambda x: x.str.lower())
-# replace all - values with zeros except for accuracy
-AMoveset.loc[:,['power', 'pp', 'effect_prob', 'gen']] = AMoveset.loc[:,['power', 'pp', 'effect_prob', 'gen']].replace('-','0')
-# replace all - values with _ for accuracy
-AMoveset['accuracy'] = AMoveset['accuracy'].replace('-','_')
-# replace inf with 999999 (large number)
-AMoveset['accuracy'] = AMoveset['accuracy'].replace('∞','999999')
-# replace 0 with 100 (large number)
-AMoveset['effect_prob'] = AMoveset['effect_prob'].replace('0','100')
-
-# typecast values to int
-AMoveset['power'] = AMoveset['power'].astype(int)
-AMoveset['pp'] = AMoveset['pp'].astype(int)
-
-# Correct spelling from "vice grip" to 'vise grip' and 'sonic boom' to 'sonicboom'
-AMoveset.loc[:,['move']] = AMoveset.loc[:,['move']].replace('vice grip','vise grip')
-AMoveset.loc[:,['move']] = AMoveset.loc[:,['move']].replace('sonic boom','sonicboom')
-
-# Correct accuracy for psywave to 80
-AMoveset.loc[np.where(AMoveset['move'] == 'psywave')[0], ['accuracy']] = 80
-# Correct accuracy for fissure, horn drill, and guillotine to 30
-AMoveset.loc[AMoveset['move'].isin(['fissure', 'horn drill', 'guillotine']), 'accuracy'] = 30
-# Correct PP for clamp to 15
-AMoveset.loc[AMoveset['move'].isin(['clamp']), 'pp'] = 15
-# Correct PP for growth and recover to 20
-AMoveset.loc[AMoveset['move'].isin(['growth', 'recover']), 'pp'] = 20
-
-# sort by name to put back into alphabetical order
-AMovesetSorted = AMoveset.sort_values(by='move')
-# reset the index values
-AMovesetSorted.index = (range(len(AMovesetSorted)))
-
-AMoveset = AMovesetSorted
-
-####################################################
-#Merge movesets into 1 Dataframe
-# merge the move set databases into one dataframe
-merged_moves_df = pd.merge(L1_moves,AMoveset.loc[:,['move', 'category', 'effect', 'effect_prob', 'gen']], on='move', how='left')
-merged_moves_df['gen'] = merged_moves_df['gen'].astype('Int64')
-merged_moves_df['effect_prob'] = merged_moves_df['effect_prob'].astype('Int64')
-#get rid of duplicate moves with different levels
-mm_columns = list(merged_moves_df.columns)
-mm_columns.remove('level')
-merged_moves_df.drop_duplicates(subset = mm_columns,keep='last',inplace=True)
+def levelup(Pokemon_dataframe, level):
+    '''Function to level up all Pokemon to a specified level'''
+    # edit stats for level
+    temp_df = Pokemon_dataframe.copy()
+    stats = ['hp', 'speed', 'attack', 'sp_attack', 'defense', 'sp_defense']
+    for pokemon in temp_df.index:
+        temp_df.loc[pokemon, 'level'] = level
+        for stat in stats:
+            if stat == 'hp':
+                temp_df.loc[pokemon, stat] = int(((temp_df.loc[pokemon, stat] * 2) * level / 100) + level + 10)
+            else:
+                temp_df.loc[pokemon, stat] = int(((temp_df.loc[pokemon, stat] * 2) * level / 100) + 5)
+        temp_df.loc[pokemon, 'base_total'] = temp_df.loc[pokemon, stats].sum()
+    return temp_df
+Pokemon_df = levelup(Pokemon_df_level1,lvl)
 
 #--------------------------------------------------------------------------------
 def verboseprint(printstatement,verbose):
@@ -166,17 +46,18 @@ def verboseprint(printstatement,verbose):
     if verbose:
         print(printstatement)
 
+
 #-------------------------------------------------------------------------------
 ##Pokemon Class:
 class Pokemon:
     '''A Class that contains traits for a single pokemon'''
 
-    def __init__(self,name):
+    def __init__(self,name,Pokemon_df):
         '''Initialize an individual pokemon by name'''
         self.name = name
         #grabs a row from Pokemon_df to reference
         self.individual_df = Pokemon_df.loc[name]
-        self.level = Pokemon_level
+        self.level = Pokemon_df.loc[name,'level']
 
         #Base stats
         self.start_speed = self.individual_df['speed']
@@ -205,9 +86,11 @@ class Pokemon:
         #create a dictionary of damage multipliers by the type of move
         self.start_damage_multiplier = type_advantages_df.to_dict()
 
-        #Available Moveset at Level 1
+        #Available Moveset
         pokemon = np.where(merged_moves_df['name'] == name) #selects pokemon's moves
-        pokemon_moves = merged_moves_df.iloc[pokemon] #dataframe of those moves
+        # define the moveset for the pokemon for corresponding level
+        pokemon_moves = merged_moves_df.iloc[pokemon]
+        pokemon_moves = pokemon_moves[pokemon_moves['level'] <= self.level]                                 
         pokemon_moves.set_index('move',inplace = True) #sets the moves as the index
         self.start_moveset = {} #dictionary of available moves
         for move in pokemon_moves.index:
@@ -218,7 +101,9 @@ class Pokemon:
                              'pp':pokemon_moves.loc[move]['pp'],\
                              'category':pokemon_moves.loc[move]['category'],\
                              'effect':pokemon_moves.loc[move]['effect'],\
-                             'effect_prob': pokemon_moves.loc[move]['effect_prob']/100}
+                             'effect_prob': pokemon_moves.loc[move]['effect_prob']/100,\
+                             'stat_change':pokemon_moves.loc[move]['stat_change'],\
+                             'amount_changed':pokemon_moves.loc[move]['amount_changed']}
 
         #statuses have stages between -6 to 6 and each corresponds with a multiplier
         #eg if attack is in stage -6, all damage will be multiplied by .25
@@ -233,12 +118,12 @@ class Pokemon:
         level = other.level
         #Calculates threshold for a critical hit:
         if other.focus_energy:
-            if working_move['effect'] == 'high critical hit ratio.':
+            if working_move['effect'] == "Increases the user's chance to score a critical hit.":
                 T = 4*(other.start_speed//4)
             else:
                 T = other.start_speed//8
         else:
-            if working_move['effect'] == 'high critical hit ratio.':
+            if working_move['effect'] == "Increases the user's chance to score a critical hit.":
                 T = 8*(other.start_speed//2)
             else:
                 T = other.start_speed//2
@@ -246,6 +131,7 @@ class Pokemon:
             T = 255
         if random.randint(1,256) < T: #If hit is critical, set damage multiplier
             critical = (2*level+5)/(level+5)
+            verboseprint("  Critical Hit!",verbose)
         else:
             critical = 1
 
@@ -258,7 +144,7 @@ class Pokemon:
                 A = A/2
             D = self.defense*self.statmods_multipliers[self.statmods['defense']]
         #if the move type matches the attacker's type: Same Type Attack Bonus
-        if working_move['type'] in other.types: 
+        if working_move['type'] in other.types.values(): 
             STAB = 1.5 
         else:
             STAB = 1
@@ -267,8 +153,8 @@ class Pokemon:
         multiplier = self.damage_multiplier[working_move['type']] #type disadvantage
         Random = random.randint(217,255)/255
 
-        Damage = (((((2*level*critical/5)+2)*power*A/D)/50)+2)*STAB*multiplier*Random
-
+        Damage = round((((((2*level*critical/5)+2)*power*A/D)/50)+2)*STAB*multiplier*Random,2)
+        verboseprint("  %s hit for %.1f damage!" % (chosen_move, Damage),verbose)
         self.hp = self.hp - Damage
         return Damage
 
@@ -283,9 +169,9 @@ class Pokemon:
                 A = A/2
         Random = random.randint(217,255)/255
         multiplier = 1
-        Damage = (((((2*level*critical/5)+2)*power*A/D)/50)+2)*STAB*multiplier*Random
+        Damage = round((((((2*level*critical/5)+2)*power*A/D)/50)+2)*STAB*multiplier*Random,2)
         self.hp -= Damage
-        verboseprint("%s hit itself in its confusion! %.2f damage! %.2f hp remaining." % \
+        verboseprint("  %s hit itself in its confusion! %.1f damage! %.1f hp remaining." % \
                      (self.name, Damage, self.hp),verbose)
         
 
@@ -293,16 +179,7 @@ class Pokemon:
         '''Randomly choses a move from pokemon's available moveset.
         If pokemon doesn't have status effects preventing them to use move, apply use move.
         Apply poison or burn damage after'''
-        #choose from available moves. If pokemon cannot use a move, removes from list
-        available_moves = list(self.moveset.keys())
-        if self.move_embargo in available_moves:
-            available_moves.remove(self.move_embargo)
-
-        #If there are still moves to choose from, randomly select a move
-        if len(available_moves)>=1:
-            chosen_move = random.choice(available_moves)
-        else: chosen_move = "struggle"
-
+                
         #Status effects that prevent moving:
         #Cannot move if asleep. Counts down to recover from sleep effects
         if self.effects_nv['sleep']:
@@ -354,32 +231,55 @@ class Pokemon:
             else:
                 confused = False
             self.effect_counter['confusion'] -= 1
-            if self.effect_counter['confusion'] ==0:
+            if self.effect_counter['confusion'] == 0:
                 self.effects_v['confusion'] = False
         else: confused = False
 
         #Effect of Petal Dance or thrash:
         if self.frenzy == True:
-            chosen_move = self.frenzy_move
             if not cant_move:
-                self.effect_counter['frenzy']-=1
-            if self.effect_counter['frenzy'] == 0:
+                self.effect_counter['frenzy'] -= 1
+            if self.effect_counter['frenzy'] <= 0:
                 self.frenzy_move = False
                 self.frenzy = False
                 self.effects_v['confusion'] = True
+                self.effect_counter['confusion'] = random.randint(1,3)
 
         cant_attack = cant_move or confused or self.underground
+        
+        #choose from available moves. If pokemon cannot use a move, removes from list
+        available_moves = list(self.moveset.keys())
+        # remove struggle from available moves if it is in the list
+        available_moves.remove('struggle')
+        
+        # Count down the move embargo
+        if self.move_embargo:
+            for move in list(self.move_embargo.keys()):
+                self.move_embargo[move] -= 1
+                if self.move_embargo[move] <= 0:
+                    verboseprint(f'  {move} is no longer disabled', verbose)
+                    del self.move_embargo[move]
+                else:
+                    if move in available_moves:
+                        available_moves.remove(move)
+                    verboseprint(f'  {move} is disabled', verbose)
+
+        #If there are still moves to choose from, randomly select a move
+        if len(available_moves)>=1:
+            chosen_move = random.choice(available_moves)
+        else: chosen_move = "struggle"
+        #Effect of frenzy:
+        if self.frenzy:
+            chosen_move = self.frenzy_move
+        #Effect of underground:
+        if self.underground and not fully_paralyzed:
+            chosen_move = self.dig_move
+        verboseprint("%s used %s!" % (self.name,chosen_move),verbose)
 
         #Effect of dig:
         if self.underground and not fully_paralyzed:
-            chosen_move = self.dig_move
             self.use_move(other,chosen_move,verbose)
             self.underground = False
-            
-
-        #Effect of rage:
-        if self.rage:
-            chosen_move = self.rage_move
 
         if cant_move:
             verboseprint("  %s can't move." % (self.name),verbose)
@@ -387,13 +287,21 @@ class Pokemon:
         if (not cant_attack) and (chosen_move):
             self.use_move(other,chosen_move,verbose) #use move
 
-        #Inflict poison or burn damage
-        if self.effects_nv['poison'] or self.effects_nv['burn']:
+        #Inflict poison damage
+        if self.effects_nv['poison']:
             damage = self.start_hp//16
             if damage == 0:
                 damage = 1
             self.hp -= damage
-            verboseprint("  %s took %d poison/burn damage" % (self.name,damage),verbose)
+            verboseprint("  %s took %d poison damage" % (self.name,damage),verbose)
+            
+        #Inflict burn damage
+        if self.effects_nv['burn']:
+            damage = self.start_hp//16
+            if damage == 0:
+                damage = 1
+            self.hp -= damage
+            verboseprint("  %s took %d burn damage" % (self.name,damage),verbose)
 
         #Inflict Seeding
         if self.effects_v['seed']:
@@ -404,13 +312,24 @@ class Pokemon:
             newhp = other.hp + damage
             if newhp > other.start_hp:
                 other.hp = other.start_hp
+            else:
+                other.hp = newhp
             verboseprint("  %s took %d seeding damage" % (self.name,damage),verbose)
             verboseprint("  %s gains %d hp!" % (other.name,damage),verbose)
+            
+        #Inflict bound damage
+        if self.effects_v['bound']:
+            damage = self.start_hp//16
+            if damage == 0:
+                damage = 1
+            self.hp -= damage
+            verboseprint("  %s took %d bound damage" % (self.name,damage),verbose)
+            self.effect_counter['bound'] -= 1
+            if self.effect_counter['bound'] == 0:
+                self.effects_v['bound'] = False
 
     def use_move(self,other,chosen_move,verbose=False):
         '''Use a chosen move against another pokemon'''
-
-        verboseprint("%s used %s!" % (self.name,chosen_move),verbose)
 
         #use_move can be called with a move that is not in the Pokemon's individual moveset.
         #if so, recreates a move dictionary for that specific move
@@ -420,12 +339,14 @@ class Pokemon:
             move = merged_moves_df.iloc[np.where(merged_moves_df['move'] == \
                                                  chosen_move)].iloc[0]
             working_move = {'type':move['type'],\
-                             'power':move['power'],\
-                             'accuracy':move['accuracy'],\
-                             'pp':move['pp'],\
-                             'category':move['category'],\
-                             'effect':move['effect'],\
-                             'effect_prob':move['effect_prob']/100}
+                            'power':move['power'],\
+                            'accuracy':move['accuracy'],\
+                            'pp':move['pp'],\
+                            'category':move['category'],\
+                            'effect':move['effect'],\
+                            'effect_prob':move['effect_prob']/100,\
+                            'stat_change':move['stat_change'],\
+                            'amount_changed':move['amount_changed']}
 
         #if no other move has been used yet, assign as first move
         if not self.first_move:
@@ -452,45 +373,89 @@ class Pokemon:
         #Given the accuracy, does the move hit?
         if random.random() < acc: #bernoulli with p = acc on whether move hits or not
             verboseprint("%s's move hits!" % (self.name),verbose) #display whether move hits
-            #If the move has effect, take effect
-            if (working_move['effect'] is not np.nan):
-                self.take_effect(other,chosen_move,working_move,verbose)
-            #if the move hits and it's special or physical, the other pokemon takes damage
-            if (working_move['category'] == 'special') or \
-            (working_move['category'] == 'physical'):
-                if not self.underground:
-                    dam = other.take_damage(self,chosen_move, working_move, verbose)
-                    if other.rage:
-                      other.take_status('attack',1)
-                
-                # for life stealing moves:
-                if (working_move['effect'] == \
-                    "user recovers half the hp inflicted on opponent."):
-                    self.hp += dam/2
-                    if self.hp > self.start_hp:
-                        self.hp = self.start_hp
-                #for recoil damage
-                if (working_move['effect'] == 'user receives recoil damage.'):
-                    self.hp -= dam/4
-                if chosen_move == "struggle":
-                    self.hp -= dam/2
-                if (working_move['effect'] == 'always inflicts 40 hp.'):
-                    dam = (40-dam)
-                    other.hp -= dam
-                    dam = 40  #for print statement
-                if (working_move['effect'] == 'always inflicts 20 hp.'):
-                    dam = (20-dam)
-                    other.hp -= dam
-                    dam = 20 #for print statement
+            # Check if the move fails
+            move_failed = False
+            if "Only works on sleeping Pokémon." in working_move['effect']:
+                if other.effects_nv['sleep']:
+                    pass
+                else:
+                    move_failed = True
+                    verboseprint('  move failed',verbose)
+            # if user is bound and tries to flee, the move fails
+            if self.effects_v['bound'] and 'teleport' == chosen_move:
+                move_failed = True
+                verboseprint('  move failed',verbose)
+            if other.effects_v['bound'] and "Forces trainers to switch Pokémon." in working_move['effect']:
+                move_failed = True
+                verboseprint('  move failed',verbose)
+            
+            if move_failed:
+                pass
+            else:
+                #If the move has effect, take effect
+                if (working_move['effect'] is not np.nan):
+                    self.take_effect(other,chosen_move,working_move,verbose)
+                #if the move hits and it's special or physical, the other pokemon takes damage
+                if (working_move['category'] == 'special') or \
+                (working_move['category'] == 'physical'):
+                    # for moves that have special effects, apply them
+                    healed = False
+                    recoil = False
+                    
+                    
+                    if not self.underground and working_move['effect'] != 'Hits 2-5 times in one turn.':
+                        dam = other.take_damage(self,chosen_move, working_move, verbose)
+                        if other.rage:
+                            other.take_status('attack',1)
+                            verboseprint(f'  {other.name}\'s attack was raised by {other.statmods_multipliers[other.statmods["attack"]]}',verbose)
+                    
+                    # for life stealing moves:
+                    if ("Drains half the damage inflicted to heal the user." in working_move['effect']):
+                        self.hp += round(dam/2,2)
+                        healed = True
+                        if self.hp > self.start_hp:
+                            self.hp = self.start_hp
+                    #for recoil damage
+                    if ("User receives 1/4 the damage it inflicts in recoil." in working_move['effect']):
+                        recoil_dam = round(dam/4,2)
+                        self.hp -= recoil_dam
+                        recoil = True
+                    if ("User receives 1/3 the damage inflicted in recoil." in working_move['effect']):
+                        recoil_dam = round(dam/3,2)
+                        self.hp -= recoil_dam
+                        recoil = True
+                    if chosen_move == "struggle":
+                        recoil_dam = round(self.start_hp/4,2)
+                        self.hp -= recoil_dam
+                        recoil = True
+                    if ("Inflicts 40 points of damage." in working_move['effect']):
+                        dam = (40-dam)
+                        other.hp -= dam
+                        dam = 40  #for print statement
+                    if ("Inflicts 20 points of damage." in working_move['effect']):
+                        dam = (20-dam)
+                        other.hp -= dam
+                        dam = 20 #for print statement
+                    if ("Inflicts damage equal to the user's level." in working_move['effect']):
+                        dam = self.level - dam
+                        other.hp -= dam
+                        dam = self.level #for print statement
+                        
 
-                #print out damage
-                if not self.underground:
-                    verboseprint("  %s hit for %.2f damage!" % (chosen_move, dam),verbose)
+                    #print out statements for damage and effects
+                    if not self.underground:
+                        if healed:
+                            verboseprint(f'  {self.name} healed for {dam/2:.1f} hp',verbose)
+                            healed = False
+                        if recoil:
+                            verboseprint(f'  {self.name} took {recoil_dam:.1f} recoil damage',verbose)
+                            recoil = False
+                        
 
-            #status moves don't have damage outside of their effects
-            elif working_move['category'] == 'status':
-                if chosen_move == "transform":
-                    self.transform(other)
+                #status moves don't have damage outside of their effects
+                elif working_move['category'] == 'status':
+                    if chosen_move == "transform":
+                        self.transform(other)
 
         else: # display whether move misses
             verboseprint("%s's move misses..." % (self.name),verbose) 
@@ -500,138 +465,143 @@ class Pokemon:
     def take_effect(self,other,chosen_move,working_move,verbose=False):
         '''Applies move affects to the appropriate pokemon
         takes as arguments other, the move name, move dictionary, and verbose'''
-
+        stat_changed = working_move['stat_change'] #Assigns stat change to a variable
+        amount_changed = working_move['amount_changed'] #Assigns amount changed to a variable
         effect = working_move['effect'] #Assigns effect to a variable
         verboseprint(f'  {effect}',verbose) #Print the effect if verbose is true
 
         ## Modifies other's stats
-        if effect == "lowers opponent's attack.":
-            other.take_status('attack',-1)
-        if effect == "lowers opponent's defense.":
-            other.take_status('defense',-1)
-        if effect == "sharply lowers opponent's defense.":
-            other.take_status('defense',-2)
-        if effect == "sharply lowers opponent's speed.":
-            other.take_status('speed',-2)
-        if effect == "lowers opponent's accuracy.":
-            other.take_status('accuracy',-1)
-        if effect == "may lower opponent's special defense.":
-            if random.random() < working_move['effect_prob']:
-                other.take_status('sp_defense',-1)
-        if (effect == "may lower opponent's speed.") or \
-        (effect == "may lower opponent's speed by one stage."):
-            if random.random() < working_move['effect_prob']:
-                other.take_status('speed',-1)
-        if effect == "may lower opponent's attack.":
-            if random.random() < working_move['effect_prob']:
-                other.take_status('attack',-1)
-
-        #Modifies Own Stats:
-        if effect == "raises user's defense.":
-            self.take_status('defense',1)
-        if effect == "sharply raises user's defense.":
-            self.take_status('defense',2)
-        if effect == "sharply raises user's special defense.":
-            self.take_status('sp_defense',2)
-        if effect == "raises user's attack and special attack.":
-            self.take_status('attack',1)
-            self.take_status('sp_attack',1)
-        if effect == "raises user's attack.":
-            self.take_status('attack',1)
-        if effect == "sharply raises user's speed.":
-            self.take_status('speed',2)
-        if effect == "sharply raises user's evasiveness.":
-            self.take_status('evasion',2)
-        if effect == "raises user's attack when hit.":
-            self.rage = True
-            self.rage_move = chosen_move
+        if stat_changed != 'N/A' and 'chance' not in effect:
+            if amount_changed < 0:
+                other.take_status(stat_changed,amount_changed)
+                # print(f'  {other.name}\'s {stat_changed} was lowered by {other.statmods_multipliers[other.statmods[stat_changed]]}')
+            elif amount_changed >= 0:
+                self.take_status(stat_changed,amount_changed)   
+                # print(f'  {self.name}\'s {stat_changed} was raised by {self.statmods_multipliers[self.statmods[stat_changed]]}')
+        elif stat_changed != 'N/A' and 'chance' in effect:  
+            if amount_changed < 0:
+                if random.random() < working_move['effect_prob']:
+                    other.take_status(stat_changed,amount_changed)
+                    # print(f'  {other.name}\'s {stat_changed} was lowered by {other.statmods_multipliers[other.statmods[stat_changed]]}')
+            elif amount_changed >= 0:
+                if random.random() < working_move['effect_prob']:
+                    self.take_status(stat_changed,amount_changed)   
+                    # print(f'  {self.name}\'s {stat_changed} was raised by {self.statmods_multipliers[self.statmods[stat_changed]]}')                
 
         #Check other's statuses: (returns true if they already have a status effect)
         nv_effects = other.check_effects()
 
         #Changes statuses that don't have multipliers:
         if not nv_effects: #Non-volatile statuses don't get overwritten
-            if effect == "puts opponent to sleep.":
+            if effect == "Puts the target to sleep.":
                 other.effects_nv['sleep'] = True
                 other.effect_counter['sleep'] = random.randint(1,7)
-            if (effect =='poisons opponent.') and ('poison' not in other.types):
+            if (effect =='Poisons the target.') and ('poison' not in other.types.values()):
                 other.effects_nv['poison']=True
-            if (effect == 'may poison the opponent.') or (effect =='may poison opponent.'):
+            if "chance to poison the target." in effect:
                 if (random.random() < working_move['effect_prob']) \
                 and ('poison' not in other.types.values()):
                     other.effects_nv['poison']=True
-            if (effect == 'paralyzes opponent.') \
-            and (working_move['type'] not in other.types.values()):
-                other.effects_nv['paralysis']= True
-            if (effect == 'may paralyze opponent.') \
-            and (working_move['type'] not in other.types.values()):
-                if (random.random() < working_move['effect_prob']):
-                    other.effects_nv['paralysis']= True
-            if effect == 'may freeze opponent.':
+            if (effect == 'Paralyzes the target.') \
+                and ('electric' not in other.types.values()):
+                if (working_move['type'] == 'electric') and ('ground' in other.types.values()):
+                    other.effects_nv['paralysis']= False
+                    verboseprint(f'  {other.name} is immune to paralysis',verbose)
+                elif working_move['type'] == 'grass' and ('grass' in other.types.values()):
+                    other.effects_nv['paralysis']= False
+                    verboseprint(f'  {other.name} is immune to move',verbose)
+                else:
+                    other.effects_nv['paralysis']= True                 
+            if "chance to paralyze the target." in effect \
+                and ('electric' not in other.types.values()):
+                if (working_move['type'] == 'electric') and ('ground' in other.types.values()):
+                    other.effects_nv['paralysis']= False
+                    verboseprint(f'  {other.name} is immune to paralysis',verbose)
+                elif working_move['type'] == 'grass' and ('grass' in other.types.values()):
+                    other.effects_nv['paralysis']= False
+                    verboseprint(f'  {other.name} is immune to move',verbose)
+                else:
+                    if random.random() < working_move['effect_prob']:
+                        other.effects_nv['paralysis']= True
+            if "chance to freeze the target." in effect:
                 if 'ice' not in other.types.values():
                     if random.random() < working_move['effect_prob']:
                         other.effects_nv['freeze'] = True
         #Burn counteracts freezing and is the exception to a non-volatile statuses staying
         if (not nv_effects) or (other.effects_nv['freeze']):
-            if effect == 'may burn opponent.':
+            if 'chance to burn the target.' in effect:
                 other.effects_nv['freeze'] = False
                 if (random.random() < working_move['effect_prob']) \
                 and ('fire' not in other.types.values()):
                     other.effects_nv['burn'] = True
 
         #Volatile Status effects:
-        if effect == 'confuses opponent.':
+        if effect == 'Confuses the target.':
             other.effects_v['confusion'] = True
             other.effect_counter['confusion'] = random.randint(1,3)
-        if effect == 'may confuse opponent.':
+        if "chance to confuse the target." in effect:
             if random.random() < working_move['effect_prob']:
                 other.effects_v['confusion'] = True
                 other.effect_counter['confusion'] = random.randint(1,3)
-        if effect == 'may cause flinching.':
+        if 'make the target flinch' in effect:
             if random.random() < working_move['effect_prob']:
                 other.effects_v['flinch'] = True
                 other.effect_counter['flinch'] = 1
-        if (effect == 'drains hp from opponent each turn.') \
-        and ('grass' not in other.types.values()):
+        if ('Seeds the target, stealing HP from it every turn.' in effect) \
+            and ('grass' not in other.types.values()):
             other.effects_v['seed']= True
+        if effect == "Prevents the target from fleeing and inflicts damage for 2-5 turns.":
+            other.effects_v['bound'] = True
+            other.effect_counter['bound'] = random.randint(2,5)
 
         #Special effects
-        if effect == "inflicts damage equal to user's level.":
-            other.hp -= self.level
+        if effect == "If the user is hit after using this move, its Attack rises by one stage.":
+            self.rage = True
         if effect == 'increases critical hit ratio.':
             self.focus_energy = True
-        if effect == 'hits 2-5 times in one turn.':
-            ntimes = random.randint(1,4)
+        if effect == 'Hits 2-5 times in one turn.':
+            ntimes = random.randint(2,5)
             for i in range(ntimes):
                 other.take_damage(self,chosen_move, working_move, verbose)
-        if effect == 'hits twice in one turn.':
+            if other.rage:
+                other.take_status('attack',1)
+                verboseprint(f'  {other.name}\'s attack was raised by {other.statmods_multipliers[other.statmods["attack"]]}',verbose)
+            verboseprint(f'  {self.name} hits {other.name} {ntimes} times',verbose)
+        if effect == 'Hits twice in one turn.':
             other.take_damage(self,chosen_move, working_move, verbose)
-        if effect ==  'user attacks for 2-3 turns but then becomes confused.':
+        if effect == 'Hits every turn for 2-3 turns, then confuses the user.' and not self.frenzy:
             self.frenzy = True
             self.effect_counter['frenzy'] = random.randint(2,3)
             self.frenzy_move = chosen_move
-        if (not self.underground) and (effect == 'digs underground on first turn, attacks on second. can also escape from caves.'):
+        if (not self.underground) and (effect == 'User digs underground, dodging all attacks, and hits next turn.'):
             verboseprint('  user digs underground',verbose)
             self.underground = True
             self.dig_move = chosen_move
-        elif self.underground and (effect == 'digs underground on first turn, attacks on second. can also escape from caves.'):
+        elif self.underground and (effect == 'User digs underground, dodging all attacks, and hits next turn.'):
             verboseprint('  user strikes from below',verbose)
             self.underground = False
-        if effect == "changes user's type to that of its first move.":
-            if self.first_move != working_move:
-                self.types[1] = self.first_move['type']
-        if effect == 'user performs almost any move in the game at random.':
+        if effect == "User's type changes to the type of one of its moves at random.": 
+            available_types = []
+            for move in self.moveset:
+                type_ = self.moveset[move]['type']
+                available_types.append(type_)
+            chosen_type = random.choice(available_types)
+            self.types[1] = chosen_type
+            verboseprint(f'  {self.name} changed type to {chosen_type}',verbose)
+        if effect == 'Randomly selects and uses any move in the game.':
             available_moves = list(merged_moves_df.move.unique())
             chosen_move = random.choice(available_moves)
+            verboseprint(f'  {self.name} used {chosen_move}',verbose)
             self.use_move(other,chosen_move,verbose)
-        if (effect == 'in battles, the opponent switches. in the wild, the pokémon runs.')\
-         or (effect =='allows user to flee wild battles; also warps player to last pokécenter.'):
+        if (effect == 'Immediately ends wild battles.  Forces trainers to switch Pokémon.')\
+         or (effect =='Immediately ends wild battles.  No effect otherwise.'):
             self.in_battle = False
             verboseprint('  teleported away',verbose)
-        if effect == "opponent can't use its last attack for a few turns.":
-            other.move_embargo = other.last_attack
-            other.effect_counter['move_embargo'] = 2
-        if effect == 'user sleeps for 2 turns, but user is fully healed.':
+        if effect == "Disables the target's last used move for 1-8 turns.":
+            if other.last_attack != False and other.last_attack != 'struggle':
+                other.move_embargo[other.last_attack] = random.randint(1,8)+1
+                verboseprint(f'  {other.last_attack} was disabled for {other.move_embargo[other.last_attack]-1} turns',verbose)
+        if effect == 'User sleeps for two turns, completely healing itself.':
             self.effects_nv['sleep'] = True
             self.effect_counter['sleep'] = 2
             self.rest = True
@@ -713,13 +683,13 @@ class Pokemon:
         self.effects_nv = {'sleep':False,'paralysis':False,'poison':False,\
                            'freeze':False,'burn':False}
         #volatile status effects:
-        self.effects_v = {'confusion':False,'flinch':False,'seed':False,}
+        self.effects_v = {'confusion':False,'flinch':False,'seed':False,'bound':False}
         #Statuses to keep track of states
         self.effect_counter = {'sleep':0,'confusion':0,'poison':0,\
-                               'move_embargo':0,'flinch':0,'frenzy':0}
+                               'flinch':0,'frenzy':0}
         self.first_move = False
         self.last_attack = False
-        self.move_embargo = False
+        self.move_embargo = {}
         self.in_battle = True
         self.focus_energy = False
         self.frenzy = False
@@ -727,7 +697,6 @@ class Pokemon:
         self.underground = False
         self.dig_move = False
         self.rage = False
-        self.rage_move = False
         self.rest = False
 
 #-------------------------------------------------------------------------------------
@@ -849,18 +818,21 @@ def check_winner(pokemona,pokemonb):
     
 #----------------------------------------------------------------------------------------
 
-def create_pokemon_dict(generation = 1):
+def create_pokemon_dict(pk_df = Pokemon_df_level1, generation = 1, pk_level = 1):
     '''Create a dictionary of pokemon objects'''
     # Assign all pokemon as a class
-    gen1 = np.where(Pokemon_df['generation'] == generation) #isolates gen 1 pokemon
+    temp_df = levelup(pk_df, pk_level)
+    gen1 = np.where(temp_df['generation'] == generation) #isolates gen 1 pokemon
     pokemon_dict = {} #Dictionary in {Pokemon name:Pokemon class format}
-    for pokemon_name in Pokemon_df.iloc[gen1].index: #for every pokemon in gen 1
+    
+    for pokemon_name in temp_df.iloc[gen1].index: #for every pokemon in gen 1
         #assign a class as a member of the dictionary
-        pokemon_dict[pokemon_name] = Pokemon(pokemon_name)
+        pokemon_dict[pokemon_name] = Pokemon(pokemon_name, temp_df)
+        
     return pokemon_dict
 
-def create_pokemon_objects(pokemon_list):
-    pokemon_dict = create_pokemon_dict()
+def create_pokemon_objects(pokemon_list, generation = 1,  pk_level = 1):
+    pokemon_dict = create_pokemon_dict(Pokemon_df_level1, generation, pk_level)
     return [pokemon_dict[pk] for pk in pokemon_list]
 
 #----------------------------------------------------------------------------------------
@@ -904,7 +876,7 @@ def battle_team(team_1, team_2, verbose=False,roundreset = True):
         winner = '2nd team'
     return winner, winner_list, rounds
 
-def run_elite(our_team,elite4,verbose = False,roundreset = True):
+def run_elite(our_team,verbose = False,roundreset = True):
     ''' Function to run the elite four battles. Input is a list of 6 pokemon and 
         the elite4 - these have to be pokemon objects.
         Returns a tuple of success,round_time,teamname,winner_list:
@@ -917,6 +889,16 @@ def run_elite(our_team,elite4,verbose = False,roundreset = True):
     winner = 'NA'
     round_time = 0
     teamname = 'NA'
+
+    elite4_1 = ['dewgong','cloyster','slowbro','jynx','lapras']
+    elite4_2 = ['onix','hitmonlee','hitmonchan','onix','machamp']
+    elite4_3 = ['gengar','golbat','haunter','arbok','gengar']
+    elite4_4 = ['gyarados','dragonair','dragonair','aerodactyl','dragonite']
+    elite_list = [elite4_1,elite4_2,elite4_3,elite4_4]
+
+    elite4 = []
+    for team in elite_list:
+        elite4.append(create_pokemon_objects(team, generation = 1, pk_level = 50))
     
     for team in elite4:
         if team ==  elite4[0]:
@@ -948,9 +930,20 @@ if __name__ == '__main__':
     #----------------------------------------------------------------------------------------
     # Create a dictionary of pokemon objects
     pokemon_dict = create_pokemon_dict()
-    # Enter Pokemon one
-    pokemon1 = 'charizard'
-    # Enter Pokemon two
-    pokemon2 = 'blastoise'
-    # Run the battle
-    runbattle(pokemon_dict[pokemon1],pokemon_dict[pokemon2],verbose=True)
+
+    # # Enter Pokemon one
+    # pokemon1 = 'charizard'
+    # # Enter Pokemon two
+    # pokemon2 = 'blastoise'
+    # # Run the battle
+    # runbattle(pokemon_dict[pokemon1],pokemon_dict[pokemon2],verbose=True)
+
+    team1 = ['bulbasaur','charmander','squirtle','pikachu','jigglypuff','meowth']
+    team1 = create_pokemon_objects(team1)
+    result,time,teamname,winnerlist = run_elite(team1,verbose=False)
+    print(result)
+    print("%.2f minutes" % time)
+    print(teamname)
+    print(winnerlist)
+    print('---------------------------------')
+    

@@ -25,7 +25,7 @@ def readpaths(path_names):
         team_number = file_name.replace("./Output_data_files\\results_team_","")
         team_number = team_number.replace(".csv","")
         team_number = int(team_number)
-        team_index = math.floor((team_number-1)/10000)
+        team_index = math.floor((team_number)/100000)
         #read output for each file
         if team_index==csv_index:
             df = pd.read_csv(file_name)
