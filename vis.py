@@ -66,7 +66,7 @@ type_colors = {
 }
 
 # create a dictionary of pokemon objects
-pk_dict = pk.create_pokemon_dict(level=level)
+pk_dict = pk.create_pokemon_dict(pk_level=level)
 # create a series of list of pokemon objects for each Elite Four Team
 elite4_1 = ['dewgong','cloyster','slowbro','jynx','lapras']
 elite4_2 = ['onix','hitmonlee','hitmonchan','onix','machamp']
@@ -413,7 +413,7 @@ with page1:
     battle_data_key = st.selectbox('Select a win data file:', options=file_options_wins, key='file_select')  # Dropdown menu for file selection
     battle_data = load_data(file_options_wins[battle_data_key], index_col='name')
     level = int(battle_data_key.split(' ')[1])
-    pk.levelup(level)
+    pk.levelup(pk.Pokemon_df,level)
     pokemon_data = pk.Pokemon_df
     move_data = pk.merged_moves_df
     total_wins = battle_data.sum(axis=1).sort_values(ascending=False).reset_index()

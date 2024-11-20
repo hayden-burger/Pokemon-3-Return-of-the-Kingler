@@ -15,7 +15,7 @@ import copy
 #Pull Data 
 ###################################
 #Pokemon_df:
-Pokemon_df = pd.read_csv('Input_data_files/pokemon.csv', index_col = 'name', keep_default_na=False)
+Pokemon_df_level1 = pd.read_csv('Input_data_files/pokemon.csv', index_col = 'name', keep_default_na=False)
 lvl = 1
 
 #---------------------------------------------------------------------------------
@@ -24,20 +24,21 @@ merged_moves_df = pd.read_csv('Input_data_files/moves.csv', keep_default_na=Fals
 
 #---------------------------------------------------------------------------------
 
-def levelup(Pokemon_dataframe = Pokemon_df, level=1):
+def levelup(Pokemon_dataframe, level):
     '''Function to level up all Pokemon to a specified level'''
     # edit stats for level
+    temp_df = Pokemon_dataframe.copy()
     stats = ['hp', 'speed', 'attack', 'sp_attack', 'defense', 'sp_defense']
-    for pokemon in Pokemon_dataframe.index:
-        Pokemon_dataframe.loc[pokemon, 'level'] = level
+    for pokemon in temp_df.index:
+        temp_df.loc[pokemon, 'level'] = level
         for stat in stats:
             if stat == 'hp':
-                Pokemon_dataframe.loc[pokemon, stat] = int(((Pokemon_dataframe.loc[pokemon, stat] * 2 + 15 + 510/6) * level / 100) + level + 10)
+                temp_df.loc[pokemon, stat] = int(((temp_df.loc[pokemon, stat] * 2) * level / 100) + level + 10)
             else:
-                Pokemon_dataframe.loc[pokemon, stat] = int(((Pokemon_dataframe.loc[pokemon, stat] * 2 + 15 + 510/6) * level / 100) + 5)
-        Pokemon_dataframe.loc[pokemon, 'base_total'] = Pokemon_dataframe.loc[pokemon, stats].sum()
-    return Pokemon_dataframe
-Pokemon_df = levelup(Pokemon_df,lvl)
+                temp_df.loc[pokemon, stat] = int(((temp_df.loc[pokemon, stat] * 2) * level / 100) + 5)
+        temp_df.loc[pokemon, 'base_total'] = temp_df.loc[pokemon, stats].sum()
+    return temp_df
+Pokemon_df = levelup(Pokemon_df_level1,lvl)
 
 #--------------------------------------------------------------------------------
 def verboseprint(printstatement,verbose):
@@ -51,7 +52,7 @@ def verboseprint(printstatement,verbose):
 class Pokemon:
     '''A Class that contains traits for a single pokemon'''
 
-    def __init__(self,name):
+    def __init__(self,name,Pokemon_df):
         '''Initialize an individual pokemon by name'''
         self.name = name
         #grabs a row from Pokemon_df to reference
@@ -817,20 +818,21 @@ def check_winner(pokemona,pokemonb):
     
 #----------------------------------------------------------------------------------------
 
-def create_pokemon_dict(generation = 1, pk_level = 1):
+def create_pokemon_dict(pk_df = Pokemon_df_level1, generation = 1, pk_level = 1):
     '''Create a dictionary of pokemon objects'''
     # Assign all pokemon as a class
-    Pokemon_df = levelup(level = pk_level)
-    gen1 = np.where(Pokemon_df['generation'] == generation) #isolates gen 1 pokemon
+    temp_df = levelup(pk_df, pk_level)
+    gen1 = np.where(temp_df['generation'] == generation) #isolates gen 1 pokemon
     pokemon_dict = {} #Dictionary in {Pokemon name:Pokemon class format}
     
-    for pokemon_name in Pokemon_df.iloc[gen1].index: #for every pokemon in gen 1
+    for pokemon_name in temp_df.iloc[gen1].index: #for every pokemon in gen 1
         #assign a class as a member of the dictionary
-        pokemon_dict[pokemon_name] = Pokemon(pokemon_name)
+        pokemon_dict[pokemon_name] = Pokemon(pokemon_name, temp_df)
+        
     return pokemon_dict
 
 def create_pokemon_objects(pokemon_list, generation = 1,  pk_level = 1):
-    pokemon_dict = create_pokemon_dict(generation, pk_level)
+    pokemon_dict = create_pokemon_dict(Pokemon_df_level1, generation, pk_level)
     return [pokemon_dict[pk] for pk in pokemon_list]
 
 #----------------------------------------------------------------------------------------
