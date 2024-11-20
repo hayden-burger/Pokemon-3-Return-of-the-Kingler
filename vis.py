@@ -37,45 +37,15 @@ def load_data(filepath, **kwargs):
 
 # import the data from the pokemon_module
 pokemon_data = pk.Pokemon_df
+level1_pokemon_data = pk.Pokemon_df_level1
 move_data = pk.merged_moves_df
 # read all sheets from the elite_results.xlsx file
 team_data = load_data('Output_data_files/elite_results.xlsx', sheet_name = None, index_col=0)  
 random_team_data = load_data('Output_data_files/Random_Team_Summary.csv', index_col=1)
 random_team_data.rename(columns={'Unnamed: 0':'Team Number'}, inplace=True)
 # Adjust the path to your file
-file_options_wins = {'Level 1 data': 'Output_data_files/Level_1_1000runs.csv'}  # Dictionary of file options
-# extend file options to include all files in the directory 'Output_data_files'
-for file in os.listdir('Output_data_files'):
-    if file.endswith('wins.csv'):
-        file_path = os.path.join('Output_data_files', file)
-        file_name = file.replace('wins.csv', '')  # Replace 'wins.csv' with ' data' in the file name
-        file_name = file_name.replace('100runs', 'Level 50: ')
-        file_name = file_name.replace('hp', ' % HP ')
-        file_name = file_name.replace('_', '')
-        file_name = file_name.replace('P ', 'P with ')
-        file_options_wins[file_name] = file_path
-
-file_options_health = {}
-for file in os.listdir('Output_data_files'):
-    if file.endswith('health.csv'):
-        file_path = os.path.join('Output_data_files', file)
-        file_name = file.replace('health.csv', '')  # Replace 'wins.csv' with ' data' in the file name
-        file_name = file_name.replace('100runs', 'Level 50: ')
-        file_name = file_name.replace('hp', ' % HP ')
-        file_name = file_name.replace('_', '')
-        file_name = file_name.replace('P ', 'P with ')
-        file_options_health[file_name] = file_path
-
-file_options_times = {}
-for file in os.listdir('Output_data_files'):
-    if file.endswith('times.csv'):
-        file_path = os.path.join('Output_data_files', file)
-        file_name = file.replace('times.csv', '')
-        file_name = file_name.replace('100runs', 'Level 50: ')
-        file_name = file_name.replace('hp', ' % HP ')
-        file_name = file_name.replace('_', '')
-        file_name = file_name.replace('P ', 'P with ')
-        file_options_times[file_name] = file_path
+file_options_wins = {'Level 1 data': 'Output_data_files/Level_1_1000runs.csv', 'Level 50 data': 'Output_data_files/Level_50_1000runs.csv'}
+level = 1
 
 # Color mapping for Pokémon types
 type_colors = {
@@ -97,7 +67,7 @@ type_colors = {
 }
 
 # create a dictionary of pokemon objects
-pk_dict = pk.create_pokemon_dict()
+pk_dict = pk.create_pokemon_dict(level1_pokemon_data,pk_level=level)
 # create a series of list of pokemon objects for each Elite Four Team
 elite4_1 = ['dewgong','cloyster','slowbro','jynx','lapras']
 elite4_2 = ['onix','hitmonlee','hitmonchan','onix','machamp']
@@ -124,7 +94,7 @@ team5 = ['poliwrath','hitmonchan','machamp','machamp','primeape','hitmonlee']
 team6 = ['mewtwo','snorlax','muk','vaporeon','wigglytuff','chansey']
 team7 = ['gengar','gyarados','articuno','haunter','zapdos','mewtwo']
 team8 = ['gengar','articuno','mewtwo','exeggutor','clefable','vaporeon']
-team9 = ['articuno','zapdos','moltres',"dodrio","farfetch'd",'pidgeot']
+team9 = ['articuno','zapdos','moltres',"dodrio","farfetchd",'pidgeot']
 team10 = ['gengar','lapras','rhydon','venusaur','onix','growlithe']
 team11 = ['exeggutor','gengar','vaporeon','clefable','mewtwo','articuno']
 teamslist = [team1,team2,team3,team4,team5,team6,team7,team8,team9,team10,team11]
@@ -269,10 +239,17 @@ def plot_performance(selected_pokemon):
     st.plotly_chart(fig_performance)
 
 # Function to display Pokémon details in a compact card format
-def display_pokemon_details(column, pokemon_name):
+def display_pokemon_details(column, pokemon_name, level=1):
     # Retrieve Pokémon details
-    details = pokemon_data.loc[pokemon_name, ['generation', 'type1', 'type2', 'height_m', 'weight_kg', 'pokedex_number', 'image_url']]
-    moves = move_data.loc[move_data['name'].isin([pokemon_name])].move
+    details = pokemon_data.loc[pokemon_name, ['generation', 'type1', 'type2', 'height_(m)', 'weight_(kg)', 'pokedex_number', 'image_url']]
+    pokemon = np.where(move_data['name'] == pokemon_name) #selects pokemon's moves
+    # define the moveset for the pokemon for corresponding level
+    pokemon_moves = move_data.iloc[pokemon]
+    moves = pokemon_moves[pokemon_moves['level'] <= level]
+    moves = moves['move']
+    # drop strugle move
+    moves = moves[moves != 'struggle']
+    
     html_content = f"""
                     <img src="{details['image_url']}" width="100"><br>
                     <b style='font-size: 20px;'>{pokemon_name}</b><br>
@@ -282,8 +259,8 @@ def display_pokemon_details(column, pokemon_name):
                     """
     if pd.notnull(details['type2']):  # Check if 'type2' is not NaN
         html_content += f"T2: {details['type2']}<br>"
-    html_content += f"""Ht: {details['height_m']} m<br>
-                    Wt: {details['weight_kg']} kg    
+    html_content += f"""Ht: {details['height_(m)']} m<br>
+                    Wt: {details['weight_(kg)']} kg    
                     <b>Moves:</b>
                     <ul>
                     """
@@ -295,10 +272,24 @@ def display_pokemon_details(column, pokemon_name):
         st.markdown(html_content, unsafe_allow_html=True)
 
 # Comparison function with color coding integration
-def compare_pokemon(column, pokemon1, pokemon2, pokemon1_color, pokemon2_color, max_base_total):
+def compare_pokemon(column, pokemon1, pokemon2, pokemon1_color, pokemon2_color, max_base_total, level=1):
     attrs = ['base_total', 'hp', 'speed', 'attack', 'defense', 'sp_attack', 'sp_defense']
-    pokemon1_data = pokemon_data.loc[pokemon1, attrs]
-    pokemon2_data = pokemon_data.loc[pokemon2, attrs]
+    pokemon1_data = pokemon_data.loc[pokemon1, attrs].copy()
+    pokemon2_data = pokemon_data.loc[pokemon2, attrs].copy()
+    
+    if level != 1:
+        for stat in attrs:
+            if stat == 'base_total':
+                pokemon1_data['base_total'] = 0
+                pokemon2_data['base_total'] = 0
+            if stat == 'hp':
+                pokemon1_data[stat] = int(((pokemon1_data[stat] * 2) * level / 100) + level + 10)
+                pokemon2_data[stat] = int(((pokemon2_data[stat] * 2) * level / 100) + level + 10)
+            else:
+                pokemon1_data[stat] = int(((pokemon1_data[stat] * 2) * level / 100) + 5)
+                pokemon2_data[stat] = int(((pokemon2_data[stat] * 2) * level / 100) + 5)
+        pokemon1_data['base_total'] = pokemon1_data[attrs].sum()
+        pokemon2_data['base_total'] = pokemon2_data[attrs].sum()
     
     comparison_data = pd.DataFrame({'Attribute': attrs, pokemon1: pokemon1_data, pokemon2: pokemon2_data}).melt(id_vars='Attribute', var_name='Pokemon', value_name='Value')
 
@@ -422,6 +413,10 @@ with page1:
     # Calculate total wins for each Pokémon
     battle_data_key = st.selectbox('Select a win data file:', options=file_options_wins, key='file_select')  # Dropdown menu for file selection
     battle_data = load_data(file_options_wins[battle_data_key], index_col='name')
+    level = int(battle_data_key.split(' ')[1])
+    
+    pokemon_data = pk.levelup(level1_pokemon_data, level=level)
+    
     total_wins = battle_data.sum(axis=1).sort_values(ascending=False).reset_index()
     total_wins.columns = ['name', 'Total Wins']  # Renaming for clarity
     # Merge total wins with pokemon_data on the Pokémon name
@@ -439,7 +434,7 @@ with page1:
 
 # Page 2: Selected Pokémon Performance
 with page2:
-    st.title('Individual Pokémon Battle Performance')
+    st.title('Single Battle Performance')
     # Calculate total wins for each Pokémon
     battle_data_key = st.selectbox('Select a win data file:', options=file_options_wins, key='file_select2')  # Dropdown menu for file selection
     battle_data = load_data(file_options_wins[battle_data_key], index_col='name')
@@ -459,6 +454,9 @@ with page3:
     battle_data_key = st.selectbox('Select a win data file:', options=file_options_wins, key='file_select3')  # Dropdown menu for file selection
     st.write("---")  # Add a separator
     battle_data = load_data(file_options_wins[battle_data_key], index_col='name')
+    level = int(battle_data_key.split(' ')[1])
+    pokemon_data = pk.levelup(level1_pokemon_data, level=level)
+    pk_dict = pk.create_pokemon_dict(pokemon_data, pk_level=level)
     total_wins = battle_data.sum(axis=1).sort_values(ascending=False).reset_index()
     total_wins.columns = ['name', 'Total Wins']  # Renaming for clarity
     # Merge total wins with pokemon_data on the Pokémon name
@@ -473,16 +471,20 @@ with page3:
     # Adjust the ratios to give more space to the middle column and less to the side columns
     col1, col_plot, col2 = st.columns([1, 4, 1])
     # 1st Pokemon card
-    display_pokemon_details(col1, pokemon1)
+    
+    display_pokemon_details(col1, pokemon1, level)
     # display pokemon stats 
     max_base_total = pokemon_data['base_total'].max() + 50
-    compare_pokemon(col_plot, pokemon1, pokemon2, pokemon1_color, pokemon2_color, max_base_total)
+    compare_pokemon(col_plot, pokemon1, pokemon2, pokemon1_color, pokemon2_color, max_base_total, level)
     # 2nd Pokemon card
-    display_pokemon_details(col2, pokemon2)
-    moves = pd.concat((move_data.loc[move_data['name'].isin([pokemon1])], (move_data.loc[move_data['name'].isin([pokemon2])]))).set_index('move').drop(columns=['name','level', 'gen']).drop_duplicates()
-    col1, col_df, col2 = st.columns([1, 20, 1])
-    col_df.write(moves)
-    
+    display_pokemon_details(col2, pokemon2, level)
+    moves1 =(move_data.loc[move_data['name'].isin([pokemon1])]).set_index('move').drop(columns=['name','gen']).drop_duplicates()
+    moves2 =(move_data.loc[move_data['name'].isin([pokemon2])]).set_index('move').drop(columns=['name','gen']).drop_duplicates()
+    col1, col_df1, mid, col_df2, col2 = st.columns([1, 10, 1, 10, 1])
+    col_df1.write(f"Moves for {pokemon1}:")
+    col_df1.write(moves1)
+    col_df2.write(f"Moves for {pokemon2}:")
+    col_df2.write(moves2)
     st.write("---")  # Add a separator
     
     # Use columns to create a visual effect of right-justified "Losses"
@@ -490,10 +492,7 @@ with page3:
 
     wins = battle_data.loc[pokemon1, pokemon2]
     losses = battle_data.loc[pokemon2, pokemon1]
-    if 'Level 50' in battle_data_key:
-        draws = 100 - wins - losses
-    else:
-        draws = 1000 - wins - losses
+    draws = 1000 - wins - losses
     with col_wins:
         # Display Wins
         st.metric(label="Wins", value=wins)
@@ -518,81 +517,8 @@ with page3:
         st.text_area("Battle Output", output, height=300)
     
     st.write("---")  # Add a separator
-    st.title('Health Remaining Comparison')
-    # Add page description
-    with st.expander("Description"):
-        st.markdown("""
-                    This page is for visualizing the health stats of two Pokémon after 100 battles. 
-                    The histogram below shows the distribution of remaining health percentages for each 
-                    Pokémon after 100 battles. The data is based on the selected health data file. Furthermore,
-                    the count of 0s is filtered out to provide a clearer view of the data as 0s represent battles
-                    where the Pokémon fainted.
-                    """)
-    # Selection box for health data
-    health_data_key = st.selectbox('Select a health data file:', options=file_options_health, key='health_data_select')
-    health_data = load_data(file_options_health[health_data_key])
-    # Convert column names to tuples
-    column_mapping = {column: ast.literal_eval(column) for column in health_data.columns}
-    health_data.rename(columns=column_mapping, inplace=True)
-    health_data.columns = ['_'.join(col) for col in health_data.columns.values]
-    st.write("---")  # Add a separator for visual clarity
-    # create tuple of pokemon names
-    pokemon_pair = pokemon1 + '_' + pokemon2
-    # get the heals data for the pair
-    health_pair = health_data[pokemon_pair]
-    # filter out the 0s
-    health_pair = health_pair[health_pair > 0]  
-    # Adjust the ratios to give more space to the middle column and less to the side columns
-    col1, col_plot, col2 = st.columns([1, 6, 1])
-    for i in range(10):
-        col1.write(' ')
-    col1.image(pokemon_data.loc[pokemon1, 'image_url'], width=100)  # Smaller width
-    # plot histogram of heals
-    with col_plot:
-        fig = px.histogram(health_pair, nbins=10, title=f'{pokemon1} vs {pokemon2} Health Remaining After 100 Battles')
-        fig.update_xaxes(title_text=f"{pokemon1}'s remaining health (%)", range=[0.1, 1])  # Set horizontal axis range
-        fig.update_layout(showlegend=False)  # Hide legend
-        fig.update_traces(marker_color=pokemon1_color)  # Set marker color
-        st.plotly_chart(fig, use_container_width=True)
-    for i in range(10):
-        col2.write(' ')
-    col2.image(pokemon_data.loc[pokemon2, 'image_url'], width=100)  # Smaller width
-    st.write("---")  # Add a separator for visual clarity
 
-    st.title('Battle Length Comparison')
-    # Add page description
-    with st.expander("Description"):
-        st.markdown("""
-                    This page is for visualizing the number of turns taken between two Pokémon after 100 battles. 
-                    The histogram below shows the distribution of turns where the data is based on the selected time data file.
-                    """)
-    # Selection box for time data
-    time_data_key = st.selectbox('Select a time data file:', options=file_options_times, key='time_data_select')
-    time_data = load_data(file_options_times[time_data_key])
-    # Convert column names to tuples
-    column_mapping = {column: ast.literal_eval(column) for column in time_data.columns}
-    time_data.rename(columns=column_mapping, inplace=True)
-    time_data.columns = ['_'.join(col) for col in time_data.columns.values]
-    st.write("---")  # Add a separator for visual clarity
-    # get the time data for the pair
-    time_pair = time_data[pokemon_pair]
-    # Adjust the ratios to give more space to the middle column and less to the side columns
-    col1, col_plot, col2 = st.columns([1, 6, 1])
-    # 1st Pokemon image
-    for i in range(10):
-        col1.write(' ')
-    col1.image(pokemon_data.loc[pokemon1, 'image_url'], width=100)  # Smaller width
-    # plot histogram of time
-    with col_plot:
-        fig = px.histogram(time_pair, nbins=10, title=f'{pokemon1} vs {pokemon2} Time Taken After 100 Battles')
-        fig.update_xaxes(title_text=f"{pokemon1}'s time taken (s)")  # Set horizontal axis range
-        fig.update_layout(showlegend=False)
-        fig.update_traces(marker_color=pokemon1_color)
-        st.plotly_chart(fig, use_container_width=True)
-    # 2nd Pokemon image
-    for i in range(10):
-        col2.write(' ')
-    col2.image(pokemon_data.loc[pokemon2, 'image_url'], width=100)  # Smaller width
+    
     
 # Page 4: Team Battle Data
 with page4:
@@ -701,7 +627,7 @@ with page5:
     if st.button('Battle the Elite Four!'):
         f = io.StringIO()
         with redirect_stdout(f):
-            myresult,mytime,winner,winnerlist = pk.run_elite(myteam,elite,verbose=True,roundreset=False)
+            myresult,mytime,winner,winnerlist = pk.run_elite(myteam,verbose=True,roundreset=False)
         output = f.getvalue()
         if myresult == 1:
             st.write(f'Congratulations! You have defeated the Elite Four! It only took {mytime*10:.0f} turns.')
@@ -746,6 +672,13 @@ with page6:
     fig_random_times = px.bar(non_zero_wins.sort_values(by='Wins', ascending=False), y='Avg Time Win', title='Average Time for Each Team')
     fig_random_times.update_layout(xaxis_title='Pokémon Team', yaxis_title='Average Time (m)')
     st.plotly_chart(fig_random_times)
+    st.write("---")  # Add a separator for visual clarity
+    # pull top 3 teams and display their names in a dataframe
+    top_teams = non_zero_wins.sort_values(by='Wins', ascending=False).head(3)
+    st.header('Top 3 Teams')
+    st.write(top_teams)
+    
+          
     st.write("---")  # Add a separator for visual clarity
     # Allow user to select an attribute to compare against Total Wins
     col1, col2 = st.columns(2)
