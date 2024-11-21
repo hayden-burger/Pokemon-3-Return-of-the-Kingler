@@ -107,13 +107,13 @@ teamsreverse = copy.deepcopy(teamslist)
 for i in range(len(teamslist)):
     teamsreverse[i].reverse()
     teams_dict['team' + str(i+1) + 'b'] = teamsreverse[i]
-
+pk_data_50 = pk.levelup(level1_pokemon_data, level=50)
 attrs = ['base_total', 'hp', 'speed', 'attack', 'defense', 'sp_attack', 'sp_defense']
 # Sum up stats for each pokemon in the team and store in a dataframe
 team_stat_df = pd.DataFrame()
 for attr in attrs:
     for team in teams_dict.keys():
-        team_stat_df.loc[team, attr] = sum([pokemon_data.loc[pokemon, attr] for pokemon in teams_dict[team]])
+        team_stat_df.loc[team, attr] = sum([pk_data_50.loc[pokemon, attr] for pokemon in teams_dict[team]])
 
 
 
@@ -309,15 +309,15 @@ def compare_teams(column, team1, team2, team1_color, team2_color, max_base_total
     team2_data = pd.DataFrame()
     # get total stats for each pokemon in the team
     for attr in attrs:
-        team1_data[attr] = [pokemon_data.loc[pokemon, attr] for pokemon in team1]
-        team2_data[attr] = [pokemon_data.loc[pokemon, attr] for pokemon in team2]
+        team1_data[attr] = [pk_data_50.loc[pokemon, attr] for pokemon in team1]
+        team2_data[attr] = [pk_data_50.loc[pokemon, attr] for pokemon in team2]
     team1_total = team1_data.sum()
     team2_total = team2_data.sum()
-    comparison_data = pd.DataFrame({'Attribute': attrs, 'Team 1': team1_total, 'Team 2': team2_total}).melt(id_vars='Attribute', var_name='Team', value_name='Value')
+    comparison_data = pd.DataFrame({'Attribute': attrs, 'Champion Team': team1_total, 'Elite Team': team2_total}).melt(id_vars='Attribute', var_name='Team', value_name='Value')
     
     with column:
         fig_comparison = px.bar(comparison_data, x='Attribute', y='Value', color='Team', barmode='group', title=f'Team Total Stats Comparison',
-                                color_discrete_map={'Team 1': team1_color, 'Team 2': team2_color})
+                                color_discrete_map={'Champion Team': team1_color, 'Elite Team': team2_color})
         fig_comparison.update_layout(yaxis=dict(range=[0, max_base_total]), width = 450)
         fig_comparison.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
                                     xaxis=dict(showline=True, linecolor='rgb(204, 204, 204)', linewidth=2),
@@ -573,12 +573,12 @@ with page4:
     col1, colplot, col2 = st.columns([1, 4, 1])
     max_base_total = 0
     for i in range(len(team_data_value)):
-        max_base_total += pokemon_data.loc[team_data_value[i], 'base_total']
+        max_base_total += pk_data_50.loc[team_data_value[i], 'base_total']
     max_base_total = max_base_total + max_base_total/10
     elite4_member = st.selectbox('Select an Elite Four Team to compare against:', options=elite_dict, key='team2_data_select')
     elite4_team = elite_dict[elite4_member]
     st.write(f'{elite4_team}')
-    team1_color, team2_color = get_pokemon_color(pokemon_data.loc[team_data_value[0], 'type1'], pokemon_data.loc[team_data_value[0], 'type2'], pokemon_data.loc[elite4_team[1], 'type1'], pokemon_data.loc[elite4_team[1], 'type2'])
+    team1_color, team2_color = get_pokemon_color(pk_data_50.loc[team_data_value[0], 'type1'], pk_data_50.loc[team_data_value[0], 'type2'], pk_data_50.loc[elite4_team[1], 'type1'], pk_data_50.loc[elite4_team[1], 'type2'])
     compare_teams(colplot, team_data_value, elite4_team, team1_color, team2_color, max_base_total)
    
     col2.subheader(elite4_member)
@@ -600,6 +600,10 @@ with page4:
 
 # Page 5: Pick a Team
 with page5:
+    # Initialize session state for selected Pokémon
+    if 'team' not in st.session_state:
+        st.session_state.team = [None] * 6
+
     st.title('Pick a Team')
     # Add page description
     with st.expander("Page Description"):
@@ -607,23 +611,26 @@ with page5:
                     This page is for selecting a team of level 50 pokémon to battle the Elite Four. 
                     The performance of the team will be recorded and displayed in the Team Battle Data page.
                     """)
+
     col1, col2, col3 = st.columns(3)
+
     # Create a selection box for choosing a team
-    pokemon_data = pk.levelup(level1_pokemon_data, level=50)
-    member_1 = col1.selectbox('Select your 1st Pokémon:', options=pokemon_data.index, key='pokemon1_select_7')
-    member_2 = col2.selectbox('Select your 2nd Pokémon:', options=pokemon_data.index, key='pokemon2_select_7')
-    member_3 = col3.selectbox('Select your 3rd Pokémon:', options=pokemon_data.index, key='pokemon3_select_7')
-    member_4 = col1.selectbox('Select your 4th Pokémon:', options=pokemon_data.index, key='pokemon4_select_7')
-    member_5 = col2.selectbox('Select your 5th Pokémon:', options=pokemon_data.index, key='pokemon5_select_7')
-    member_6 = col3.selectbox('Select your 6th Pokémon:', options=pokemon_data.index, key='pokemon6_select_7')
-    team = [member_1, member_2, member_3, member_4, member_5, member_6]
+    st.session_state.team[0] = col1.selectbox('Select your 1st Pokémon:', options=pokemon_data.index, key='pokemon1_select_7', index=pokemon_data.index.get_loc(st.session_state.team[0]) if st.session_state.team[0] else 0)
+    st.session_state.team[1] = col2.selectbox('Select your 2nd Pokémon:', options=pokemon_data.index, key='pokemon2_select_7', index=pokemon_data.index.get_loc(st.session_state.team[1]) if st.session_state.team[1] else 0)
+    st.session_state.team[2] = col3.selectbox('Select your 3rd Pokémon:', options=pokemon_data.index, key='pokemon3_select_7', index=pokemon_data.index.get_loc(st.session_state.team[2]) if st.session_state.team[2] else 0)
+    st.session_state.team[3] = col1.selectbox('Select your 4th Pokémon:', options=pokemon_data.index, key='pokemon4_select_7', index=pokemon_data.index.get_loc(st.session_state.team[3]) if st.session_state.team[3] else 0)
+    st.session_state.team[4] = col2.selectbox('Select your 5th Pokémon:', options=pokemon_data.index, key='pokemon5_select_7', index=pokemon_data.index.get_loc(st.session_state.team[4]) if st.session_state.team[4] else 0)
+    st.session_state.team[5] = col3.selectbox('Select your 6th Pokémon:', options=pokemon_data.index, key='pokemon6_select_7', index=pokemon_data.index.get_loc(st.session_state.team[5]) if st.session_state.team[5] else 0)
+
     # Display the team members with their sprites
     st.write("Team Members:")
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     for i in range(6):
-        display_pokemon_details(eval(f'col{i+1}'), team[i])
+        display_pokemon_details(eval(f'col{i+1}'), st.session_state.team[i], level=50)
+
     st.write("---")  # Add a separator for visual clarity
-    myteam = pk.create_pokemon_objects(team)
+    myteam = pk.create_pokemon_objects(st.session_state.team, pk_level=50)
+
     # Button for initiating the battle
     if st.button('Battle the Elite Four!'):
         f = io.StringIO()
