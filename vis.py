@@ -651,8 +651,8 @@ with page6:
     # Add page description
     with st.expander("Page Description"):
         st.markdown("""
-                    This page is for visualizing the performance of 69770 randomly chosen teams of pokémon.
-                    Of the 151^6 possible teams, 69770 teams were randomly selected due to time constraint.
+                    This page is for visualizing the performance of 100000 randomly chosen teams of pokémon.
+                    Of the 151^6 possible teams, 100000 teams were randomly selected due to time constraint.
                     Each team faces the Elite Four and their performance is recorded in the data files.
                     This page explores the results of that data.
                     """)
