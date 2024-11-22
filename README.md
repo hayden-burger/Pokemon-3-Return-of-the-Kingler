@@ -27,7 +27,7 @@ Special thanks to our course instructors and peers at NPS for their support and 
 
 ### Presentation and Paper
 
-Contains the presentationa and paper submitted for our final project.
+Contains the presentation and a tutorial for replicating our results.
 
 ### Scripts for HPC
 
