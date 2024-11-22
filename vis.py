@@ -512,7 +512,7 @@ with page3:
     st.write("---")  # Add a separator for visual clarity
     level_page4 = st.slider('Select the level for your team:', min_value=1, max_value=100, value=50, step=1, key='level_select_4')
     pokemon_data = pk.levelup(level1_pokemon_data, level=level_page4)
-    pk_dict = pk.create_pokemon_dict(pokemon_data, pk_level=level)
+    pk_dict = pk.create_pokemon_dict(pokemon_data, pk_level=level_page4)
     st.write("---")  # Add a separator for visual clarity
 
     # Button for initiating the battle
