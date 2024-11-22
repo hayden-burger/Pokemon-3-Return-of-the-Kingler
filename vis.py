@@ -450,13 +450,19 @@ with page2:
 # Page 3: Selected Pokémon Stats
 with page3:
     st.title('Pokémon Stat Comparison')
+    with st.expander("Page Description"):
+        st.markdown("""
+                    This page allows you to compare the stats of two Pokémon and see how they stack up against each other.
+                    This page summarizes 1000 battles between each pair of Pokémon and displays the results based on the chosen file.
+                    You can also simulate a battle between the two Pokémon and see the results for a given level.
+                    """)
     # Calculate total wins for each Pokémon
     battle_data_key = st.selectbox('Select a win data file:', options=file_options_wins, key='file_select3')  # Dropdown menu for file selection
     st.write("---")  # Add a separator
     battle_data = load_data(file_options_wins[battle_data_key], index_col='name')
     level = int(battle_data_key.split(' ')[1])
     pokemon_data = pk.levelup(level1_pokemon_data, level=level)
-    pk_dict = pk.create_pokemon_dict(pokemon_data, pk_level=level)
+    
     total_wins = battle_data.sum(axis=1).sort_values(ascending=False).reset_index()
     total_wins.columns = ['name', 'Total Wins']  # Renaming for clarity
     # Merge total wins with pokemon_data on the Pokémon name
@@ -503,6 +509,10 @@ with page3:
         # Display Losses
         st.metric(label="Losses", value=losses)
     
+    st.write("---")  # Add a separator for visual clarity
+    level_page4 = st.slider('Select the level for your team:', min_value=1, max_value=100, value=50, step=1, key='level_select_4')
+    pokemon_data = pk.levelup(level1_pokemon_data, level=level_page4)
+    pk_dict = pk.create_pokemon_dict(pokemon_data, pk_level=level)
     st.write("---")  # Add a separator for visual clarity
 
     # Button for initiating the battle
@@ -604,14 +614,19 @@ with page5:
     if 'team' not in st.session_state:
         st.session_state.team = [None] * 6
 
-    st.title('Pick a Team')
+    st.title('Pick a Team to Battle the Elite Four')
     # Add page description
     with st.expander("Page Description"):
         st.markdown("""
                     This page is for selecting a team of level 50 pokémon to battle the Elite Four. 
                     The performance of the team will be recorded and displayed in the Team Battle Data page.
                     """)
-
+        
+    st.write("---")  # Add a separator for visual clarity
+    level_page5 = st.slider('Select the level for your team:', min_value=1, max_value=100, value=50, step=1, key='level_select_7')
+    pokemon_data = pk.levelup(level1_pokemon_data, level=level_page5)
+    st.write("---")  # Add a separator for visual clarity
+    
     col1, col2, col3 = st.columns(3)
 
     # Create a selection box for choosing a team
@@ -626,10 +641,10 @@ with page5:
     st.write("Team Members:")
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     for i in range(6):
-        display_pokemon_details(eval(f'col{i+1}'), st.session_state.team[i], level=50)
+        display_pokemon_details(eval(f'col{i+1}'), st.session_state.team[i], level=level_page5)
 
     st.write("---")  # Add a separator for visual clarity
-    myteam = pk.create_pokemon_objects(st.session_state.team, pk_level=50)
+    myteam = pk.create_pokemon_objects(st.session_state.team, pk_level=level_page5)
 
     # Button for initiating the battle
     if st.button('Battle the Elite Four!'):
@@ -658,7 +673,7 @@ with page6:
                     """)
 
     st.write("---")  # Add a separator for visual clarity
-    win_counts = pd.DataFrame(random_team_data.Wins.value_counts()).transpose()
+    win_counts = pd.DataFrame(random_team_data.Wins.value_counts()).sort_index().transpose()
     # Plot histogram of wins
     fig_random_wins = px.bar(random_team_data.Wins.value_counts(), title='Frequency of Wins for Across Random Teams')
     fig_random_wins.update_layout(xaxis_title='Win Count', yaxis_title='Frequency')
